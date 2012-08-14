@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE X3D PUBLIC "ISO//Web3D//DTD X3D 3.0//EN"   "http://www.web3d.org/specifications/x3d-3.0.dtd">
+<X3D profile="Full">
+	<head>
+		<meta name='title' content='coord_system.x3d'/>
+		<meta name='description' content='right handed euclidean coordinate system, x=red, y=green, z=blue'/>
+		<meta name='creator' content='Christian Waechter'/>
+		<meta name='created' content='18 October 2009'/>
+	</head>
+	<Scene>
+		<Appearance DEF="red">
+			<Material transparency="0.0" diffuseColor="1.0 0.0 0.0"/>
+		</Appearance>
+		<Appearance DEF="green">
+			<Material transparency="0.0" diffuseColor="0.0 1.0 0.0"/>
+		</Appearance>
+		<Appearance DEF="blue">
+			<Material transparency="0.0" diffuseColor="0.0 0.0 1.0"/>
+		</Appearance>
+		<Transform scale="0.2 0.2 0.2" >
+		<Transform rotation="0.0 0.0 0.0  0.0" >
+			<Transform translation="0.0 -0.25 0.0" >
+				<Shape>
+					<Appearance USE="green" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		<Transform rotation="1.0 0.0 0.0 -3.14" >
+			<Transform translation="0.0 -0.25 0.0" >
+				<Shape>
+					<Appearance USE="green" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		<Transform rotation="0.0 0.0 1.0  -1.57" >
+			<Transform translation="0.0 -0.25 0.0">
+				<Shape>
+					<Appearance USE="red" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		<Transform rotation="0.0 0.0 1.0  1.57" >
+			<Transform translation="0.0 -0.25 0.0">
+				<Shape>
+					<Appearance USE="red" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		<Transform rotation="1.0 0.0 0.0  1.57" >
+			<Transform translation="0.0 -0.25 0.0" >
+				<Shape>
+					<Appearance USE="blue" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		<Transform rotation="1.0 0.0 0.0  -1.57" >
+			<Transform translation="0.0 -0.25 0.0" >
+				<Shape>
+					<Appearance USE="blue" />
+					<Cone bottomRadius="0.05" height="0.5"/>
+				</Shape>
+			</Transform>
+		</Transform>
+		</Transform>
+		<WorldInfo title='3D Crosshair' info='"This scene is based on the coord_system.x3d from the ubitrack library" "http://campar.in.tum.de/UbiTrack/WebHome"'/>
+	</Scene>
+</X3D>

@@ -1,0 +1,22 @@
+# add configuration options
+Import( '*' )
+
+SConscript ( '#/config/libraryConfig.py' )
+Import('standardLibFinder', 'standardLibConfig')
+
+opts.Add( 'COIN3D_PATH', 'Path to the Coin library (only for vision parts)' )
+opts.Add( 'COIN3D_INCLUDE', 'Path to the Coin headers' )
+opts.Add( 'COIN3D_LIBS', 'Path to the Coin libraries' )
+
+libName = "COIN3D"
+
+compileSettings =  [{} , "", "Inventor/SoDB.h", "C++", "SoDB::init();"]
+libFinder = standardLibFinder(libName,compileSettings)
+
+configHelper = standardLibConfig(libName, libFinder)
+
+coin_options = configHelper.getLibraryOptions()
+have_coin = configHelper.haveLib()
+
+# export results
+Export( [ 'have_coin', 'coin_options' ] )

@@ -1,0 +1,22 @@
+# add configuration options
+Import( '*' )
+
+SConscript ( '#/config/libraryConfig.py' )
+Import('standardLibFinder', 'standardLibConfig')
+
+opts.Add( 'GLEW_PATH', 'Path to the glew library' )
+opts.Add( 'GLEW_INCLUDE', 'Path to the glew headers' )
+opts.Add( 'GLEW_LIBS', 'Path to the glew libraries' )
+
+libName = "GLEW"
+
+compileSettings =  [{} , "", "GL/glew.h", "C++", "glewInit( );"]
+libFinder = standardLibFinder(libName,compileSettings)
+
+configHelper = standardLibConfig(libName, libFinder)
+
+glew_options = configHelper.getLibraryOptions()
+have_glew = configHelper.haveLib()
+
+# export results
+Export( [ 'have_glew', 'glew_options' ] )

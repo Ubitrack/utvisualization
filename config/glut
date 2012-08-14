@@ -1,0 +1,39 @@
+import os
+import sys
+
+# add configuration options
+Import( '*' )
+
+SConscript ( '#/config/libraryConfig.py' )
+Import('standardLibFinder', 'standardLibConfig')
+
+opts.Add( 'GLUT_PATH', 'Path to the glut library (only for VRML viewer component)' )
+opts.Add( 'GLUT_INCLUDE', 'Path to the glut headers' )
+opts.Add( 'GLUT_LIBS', 'Path to the glut libraries' )
+
+libName = "GLUT"
+
+compileSettings = []
+if sys.platform == 'darwin':
+	compileSettings =[ {}, "", "GLUT/glut.h", "C++", "glutInitWindowSize( 800, 600 );"]		
+else:
+	# prefer freeglut over glut
+	#compileSettings =[ {}, "", "GL/glut.h", "C++", "glutInitWindowSize( 800, 600 );"]		
+	compileSettings =[ {}, "", "GL/freeglut.h", "C++", "glutMainLoopEvent();"]		
+	
+	#if conf.CheckLibWithHeader( "freeglut", "GL/glut.h", "C++", "glutInitWindowSize( 800, 600 );", 0 ):
+	#elif conf.CheckLibWithHeader( "glut", "GL/freeglut.h", "C++", "glutMainLoopEvent();", 0 ):
+	#	glut_options[ 'LIBS' ] = [ 'glut' ] + glut_options.get( 'LIBS', [] )
+	
+
+libFinder = standardLibFinder(libName,compileSettings)
+
+configHelper = standardLibConfig(libName, libFinder)
+
+glut_options = configHelper.getLibraryOptions()
+have_freeglut = configHelper.haveLib()
+
+
+
+# export results
+Export( [ 'have_freeglut', 'glut_options'] )

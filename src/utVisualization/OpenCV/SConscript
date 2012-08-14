@@ -1,0 +1,21 @@
+import sys
+import glob
+import os.path
+
+# import variables from other scons files
+Import( '*' )
+env = utVisualizationEnv.Clone()
+
+# this driver requires the GLUT library
+if not have_opencv:
+	print "Not building the HighguiWindow component: OpenCV library not available."
+else:
+
+	# automatically glob files
+	headers = globSourceFiles( '*.h' )
+	sources = globSourceFiles( '*.cpp' )
+
+
+	# compile driver
+	setupComponentBuild(env, sources, "utVisualization")
+	

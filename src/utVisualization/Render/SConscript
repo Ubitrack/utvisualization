@@ -1,0 +1,58 @@
+import sys
+import glob
+import os.path
+
+# import variables from other scons files
+Import( '*' )
+env = utVisualizationEnv.Clone()
+
+# this driver requires the GLUT library
+if not have_freeglut:
+	if sys.platform == 'darwin':
+		print "Not building the render module: GLUT framework not available."
+	else:
+		print "Not building the render module: FreeGLUT library not available."
+else:
+	# take driver name from directory name, replace if you don't like the result
+	driverName = os.path.basename( Dir( '.' ).srcnode().abspath )
+
+	# automatically glob files
+	headers = globSourceFiles( '*.h' )
+	sources = globSourceFiles( '*.cpp' )
+
+	# append driver specific build options here
+
+	# env.Append( CCFLAGS = '-DHAVE_OPENCV' )
+	if not have_opencv:		
+		sources.remove('BackgroundImage.cpp')
+		sources.remove('ZBufferOutput.cpp')
+		sources.remove('ImageOutput.cpp')
+		headers.remove('BackgroundImage.h')
+		headers.remove('ZBufferOutput.h')
+		headers.remove('ImageOutput.h')
+	
+	if have_lapack:
+		env.AppendUnique( **lapack_options )		
+	else:
+		sources.remove('PositionErrorVisualization.cpp')
+		sources.remove('PoseErrorVisualization.cpp')
+		headers.remove('PositionErrorVisualization.h')
+		headers.remove('PoseErrorVisualization.h')
+		
+
+	if have_coin:
+		env.AppendUnique( **coin_options )
+	else:
+		sources.remove('InventorObject.cpp')
+		headers.remove('InventorObject.h')
+
+	if have_glew:
+		env.AppendUnique( **glew_options )
+
+
+	# setup compiler and linker flags	
+	env.AppendUnique( **glut_options )	
+
+	# compile driver
+	setupSingleComponentBuild(env, sources, driverName, "utVisualization")
+	

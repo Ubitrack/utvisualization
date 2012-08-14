@@ -1,0 +1,23 @@
+import glob
+
+Import( '*' )
+
+# create a common build environment for all drivers
+utVisualizationEnv = masterEnv.Clone()
+
+utVisualizationEnv.AppendUnique( **mergeOptions( utcore_options, utdataflow_options, boost_options, tinyxml_options, log4cpp_options, utvision_options, opencv_options ) )
+utVisualizationEnv.AppendUnique( LIBS = boost_libs( [ 'thread' ] ) )
+utVisualizationEnv.Replace( no_import_lib = 1 )
+
+Export( 'utVisualizationEnv' )
+
+# glob all SConscript files in subdirectories
+sconsfiles = globSourceFiles( "utVisualization/*/SConscript" )
+
+# recurse into subdirectories and export driver build environment
+SConscript( sconsfiles, [ 'utVisualizationEnv' ] )
+success = True
+Return('success')
+
+
+

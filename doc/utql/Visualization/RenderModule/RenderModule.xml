@@ -1,0 +1,969 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+	TODO: add required attributes as predicate "name!=''" to input nodes
+-->
+
+<UTQLPatternTemplates xmlns='http://ar.in.tum.de/ubitrack/utql'
+                      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                      xmlns:xi='http://www.w3.org/2001/XInclude'
+                      xmlns:h="http://www.w3.org/1999/xhtml"
+                      xsi:schemaLocation='http://ar.in.tum.de/ubitrack/utql ../../../schema/utql_templates.xsd'>
+    
+    <Pattern name="VirtualCameraParam" displayName="Renderer: Virtual Camera Settings">
+        <Description>
+            <h:p>This node represents a virtual camera which generates one corresponding output window. It is needed for several patterns, e.g. X3DObject and InventorObject.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="Camera" displayName="Camera">
+                <Attribute name="virtualCameraFov" displayName="Field of view" default="30" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Field-of-view for the default perspective projection in degrees.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="virtualCameraNear" displayName="Near clipping plane" default="0.01" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Distance of near clipping plane in meters.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="virtualCameraFar" displayName="Far clipping plane" default="40" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Distance of far clipping plane in meters.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="virtualCameraWidth" displayName="Width" default="640" xsi:type="IntAttributeDeclarationType">
+                    <Description>
+                        <h:p>Width of output window in pixels.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="virtualCameraHeight" displayName="Height" default="480" xsi:type="IntAttributeDeclarationType">
+                    <Description>
+                        <h:p>Height of output window in pixels.</h:p>
+                    </Description>
+                </Attribute>
+				
+                <Attribute name="virtualCameraFullscreen" displayName="Full-screen" default="false" xsi:type="EnumAttributeDeclarationType">
+                    <Description>
+                        <h:p>Start in full-screen mode?</h:p>
+                    </Description>
+                    <EnumValue name="false" displayName="False"/>
+                    <EnumValue name="true" displayName="True"/>
+                </Attribute>
+                <Attribute name="virtualCameraMonitorX" displayName="Monitor X" default="0" xsi:type="IntAttributeDeclarationType">
+                    <Description>
+                        <h:p>X-coordinate of a point on the monitor to be used for full-screen mode.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="virtualCameraMonitorY" displayName="Monitor Y" default="0" xsi:type="IntAttributeDeclarationType">
+                    <Description>
+                        <h:p>Y-coordinate of a point on the monitor to be used for full-screen mode.</h:p>
+                    </Description>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="X3DObjectParam" displayName="Renderer: X3D Object Settings">
+        <Description>
+            <h:p>This node represents an X3D object to be rendered. It is needed as parametrization for the X3DObject pattern.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="X3DObject" displayName="X3D Object">
+                <Attribute name="virtualObjectX3DPath" displayName="X3D File" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>The path pointing to the X3D file.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="occlusionOnly" displayName="Occlusion Only" default="false" xsi:type="EnumAttributeDeclarationType">
+                    <Description>
+                        <h:p>When
+                            <h:code>true</h:code>, object is only rendered to z-buffer and acts as occluder.
+                        </h:p>
+                    </Description>
+                    <EnumValue name="false" displayName="False"/>
+                    <EnumValue name="true" displayName="True"/>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="InventorObjectParam" displayName="Renderer: Inventor Object Settings">
+        <Description>
+            <h:p>This node represents an Inventor object to be rendered. It is needed as parametrization for the InventorObject pattern.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="InventorObject" displayName="Inventor Object">
+                <Attribute name="virtualObjectInventorPath" displayName="Inventor File" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>The path pointing to the Inventor file.</h:p>
+                    </Description>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="DropShadowParam" displayName="Renderer: Drop Shadow Settings">
+        <Description>
+            <h:p>This node represents a shadow to be rendered. It is needed as parametrization for the DropShadow pattern.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="ShadowObject" displayName="Shadow Object">
+                <Attribute name="shadowWidth" displayName="Shadow Width" default="1" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>X dimension of shadow.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="shadowHeight" displayName="ShadowHeight" default="1" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Y dimension of shadow.</h:p>
+                    </Description>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="WorldFrameParam" displayName="Renderer: World Frame Settings">
+        <Description>
+            <h:p>This node represents a generic world frame including a grid in the X/Z-plane. It is needed for parametrization the WorldFrame pattern. The RGBA value allows for specification of the color of the grid lines.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="WorldFrame" displayName="World Frame">
+                <Attribute name="gridCountX" displayName="Grid lines X" min="0.0" default="10.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Amount of grid lines in x-direction</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="gridCountZ" displayName="Grid lines Z" min="0.0" default="10.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Amount of grid lines in z-direction</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="size" displayName="Size of world plane" min="0.0" default="2.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Size of world plane along the X and Z axis.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="thickness" displayName="Thickness of grid lines" min="0.0" default="0.5" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Thickness of grid lines.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="rgba" displayName="Grid RGBA color value" xsi:type="DoubleArrayAttributeReferenceType"/>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="SkyboxParam" displayName="Renderer: Skybox Settings">
+        <Description>
+            <h:p>This node represents a skybox. It is needed for parametrization the WorldFrame pattern.</h:p>
+        </Description>
+        				
+        <Output>
+            <Node name="Skybox" displayName="Skybox">
+                <Attribute name="front" displayName="front" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>front side texutre.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="back" displayName="back" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>back side texutre.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="left" displayName="left" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>left side texutre.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="right" displayName="right" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>right side texutre.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="up" displayName="up" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>up side texutre.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="down" displayName="down" xsi:type="PathAttributeDeclarationType">
+                    <Description>
+                        <h:p>down side texutre.</h:p>
+                    </Description>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="AntiMarkerParam" displayName="Renderer: Anti-Marker Settings">
+        <Description>
+            <h:p>This node represents a rectangle covering a marker. It is needed as parametrization for the AntiMarkerParam pattern.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="AntiMarkerObject" displayName="Anti-Marker Object">
+                <Attribute name="factor" displayName="Factor" default="0.06" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>The enlargement factor for the covered area.</h:p>
+                    </Description>
+                </Attribute>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    <Pattern name="PointCloudParam" displayName="Renderer: Point Cloud Settings">
+        <Description>
+            <h:p>This node represents a point cloud. It is needed as parametrization for the PointCloud pattern.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="PointCloudObject" displayName="Point Cloud Object">
+                <Attribute name="TTL" displayName="Time To Live" default="1.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Time in seconds after which a received set of points expires.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="size" displayName="Point Size" default="5.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Size of dots in pixels.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="rgba" displayName="Point Color" xsi:type="DoubleArrayAttributeReferenceType"/>
+            </Node>
+        </Output>
+    </Pattern>
+    
+    
+    <Pattern name="Transparency" displayName="Renderer: Transparency">
+        <Description>
+            <h:p>This component forces other components to render at a certain transparency level. The alpha value is adjustable at runtime.</h:p>
+        </Description>
+
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Edge name="Input" source="Camera" destination="Object" displayName="Alpha value">
+                <Description>
+                    <h:p>Alpha value</h:p>
+                </Description>
+                <Predicate>type=='Distance'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="Transparency"/>
+        </DataflowConfiguration>
+    </Pattern>
+
+
+    <Pattern name="X3DObject" displayName="Renderer: X3D Object Pose">
+        <Description>
+            <h:p>This component displays an X3D file in the output window.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object">
+                <Predicate>virtualObjectX3DPath!=''</Predicate>
+            </Node>
+            <Edge name="Input" source="Camera" destination="Object" displayName="Object Pose">
+                <Description>
+                    <h:p>The desired object pose</h:p>
+                </Description>
+                <Predicate>type=='6D'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="X3DObject"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="InventorObject" displayName="Renderer: Inventor Object Pose">
+        <Description>
+            <h:p>This component displays an Inventor file in the output window.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Edge name="Input" source="Camera" destination="Object" displayName="Object Pose">
+                <Description>
+                    <h:p>The desired object pose</h:p>
+                </Description>
+                <Predicate>type=='6D'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="InventorObject"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="DropShadow" displayName="Renderer: Simulated Shadow Pose">
+        <Description>
+            <h:p>This component displays a simulated shadow beneath a virtual object.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Edge name="Input" source="Camera" destination="Object" displayName="Shadow Pose">
+                <Description>
+                    <h:p>The desired shadow pose</h:p>
+                </Description>
+                <Predicate>type=='6D'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="DropShadow"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="WorldFrame" displayName="Renderer: Generic Grid World Frame">
+        <Description>
+            <h:p>This component displays a generic grid world frame.</h:p>
+        </Description>
+            
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Edge name="Input" source="Camera" destination="Object" displayName="World Pose">
+                <Description>
+                    <h:p>The desired world pose</h:p>
+                </Description>
+                <Predicate>type=='6D'</Predicate>
+            </Edge>
+        </Input>
+
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="WorldFrame"/>
+        </DataflowConfiguration>
+    </Pattern>
+
+
+    <Pattern name="Skybox" displayName="Renderer: Skybox">
+        <Description>
+            <h:p>This component displays a Skybox.</h:p>
+        </Description>
+            
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Skybox" displayName="Skybox"/>
+            <Edge name="PushInput" source="Camera" destination="Skybox" displayName="Shadow Pose (Push)">
+                <Description>
+                    <h:p>The desired shadow pose</h:p>
+                </Description>
+                <Predicate>type=='3DRotation'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+            
+        <DataflowConfiguration>
+            <UbitrackLib class="Skybox"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="AntiMarker" displayName="Renderer: Marker Removal">
+        <Description>
+            <h:p>This component takes a list of four 2D positions (as provided, e.g., by the MarkerTracker via its "Corners" port. The given quad is enlarged by an optional factor (default 6%) and background image color is sampled at the four corner points. Finally, an interpolated colored quad is drawn, thereby eradicating the marker.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Edge name="PushInput" source="Camera" destination="Object" displayName="Marker Corners">
+                <Description>
+                    <h:p>The marker corners</h:p>
+                </Description>
+                <Predicate>type=='2DPositionList'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="AntiMarker"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="PointCloud" displayName="Renderer: Point Cloud">
+        <Description>
+            <h:p>This component takes a list of 3D positions and displays them as a cloud of colored dots.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="PointCloud" displayName="Point Cloud"/>
+            <Edge name="PushInput" source="Camera" destination="PointCloud" displayName="Point Positions">
+                <Description>
+                    <h:p>The dot positions</h:p>
+                </Description>
+                <Predicate>type=='3DPositionList'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="PointCloud"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="DirectionLine" displayName="Renderer: Direction Line">
+        <Description>
+            <h:p>This component renders a line between two coordinate frames the position of which is known.</h:p>
+        </Description>
+
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Start" displayName="Starting Point"/>
+            <Node name="End" displayName="End Point"/>
+            <Edge name="SourcePosition" source="Camera" destination="Start" displayName="Start Pose">
+                <Description>
+                    <h:p>3D Position of the originating frame of the line</h:p>
+                </Description>
+                <Predicate>type=='3DPosition'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+            <Edge name="TargetPosition" source="Camera" destination="End" displayName="Target Position">
+                <Description>
+                    <h:p>3D Position of the target frame the line is pointing to</h:p>
+                </Description>
+                <Predicate>type=='3DPosition'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="DirectionLine"/>
+            <Attribute name="thickness" displayName="Thickness of grid lines" min="0.0" default="0.5" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Thickness of grid lines.</h:p>
+                </Description>
+            </Attribute>
+            <Attribute name="rgba" displayName="Grid RGBA color value" xsi:type="DoubleArrayAttributeReferenceType"/>
+        </DataflowConfiguration>
+    </Pattern>
+
+
+    <Pattern name="Intrinsics" displayName="Renderer: Intrinsic Camera Parameters">
+        <Description>
+            <h:p>This component modifies the virtual camera projection matrix to match a previously calibrated matrix.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Edge name="Intrinsics" source="Camera" destination="ImagePlane" displayName="Intrinsic Matrix">
+                <Description>
+                    <h:p>The intrinsic camera matrix</h:p>
+                </Description>
+                <Predicate>type=='3x3Matrix'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="Intrinsics"/>
+            <Attribute name="calibWidth" displayName="Calibration Image Width" default="320.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Width of image at calibration time.</h:p>
+                </Description>
+            </Attribute>
+            <Attribute name="calibHeight" displayName="Calibration Image Height" default="240.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Height of image at calibration time.</h:p>
+                </Description>
+            </Attribute>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="CameraPosePull" displayName="Renderer: Camera Pose (Pull)">
+        <Description>
+            <h:p>This component directly sets the pose of the virtual camera.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="World" displayName="World"/>
+            <Edge name="PullInput" source="World" destination="Camera" displayName="Camera Pose (Pull)">
+                <Description>
+                    <h:p>The desired camera pose</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="CameraPose"/>
+        </DataflowConfiguration>
+    </Pattern>
+
+
+    <Pattern name="CameraPosePush" displayName="Renderer: Camera Pose (Push)">
+        <Description>
+            <h:p>This component directly sets the pose of the virtual camera.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="World" displayName="World"/>
+            <Edge name="PushInput" source="World" destination="Camera" displayName="Camera Pose (Push)">
+                <Description>
+                    <h:p>The desired camera pose</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="CameraPose"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="ButtonOutput" displayName="Renderer: Renderer Keyboard Events">
+        <Description>
+            <h:p>This component has an output port for signal events (i.e. keypresses in the output window).</h:p>
+        </Description>
+
+        <Output>
+            <Node name="COS1" displayName="COS1"/>
+            <Node name="COS2" displayName="COS2"/>
+            <Node name="Camera" displayName="Camera">
+                <Description>
+                    <h:p>Drag this node onto the VirtualCameraSettings node of which you want to receive signal events.</h:p>
+                </Description>
+            </Node>
+            <Edge name="Output" source="COS1" destination="COS2" displayName="Keyboard Events">
+                <Description>
+                    <h:p>The push output for keyboard events.</h:p>
+                </Description>
+                <Attribute name="type" value="Button" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="mode" value="push" xsi:type="EnumAttributeReferenceType"/>
+            </Edge>
+        </Output>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="ButtonOutput"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="Projection" displayName="Renderer: Projection Matrix (4x4)">
+        <Description>
+            <h:p>This component allows to directly set an arbitrary projection matrix.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Edge name="Input" source="Camera" destination="ImagePlane" displayName="Projection Matrix">
+                <Description>
+                    <h:p>The desired projection matrix</h:p>
+                </Description>
+                <Predicate>type=='4x4Matrix'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="Projection"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="Projection3x4" displayName="Renderer: Projection Matrix (3x4)">
+        <Description>
+            <h:p>This component allows to directly set an arbitrary 3x4 projection matrix.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Edge name="Input" source="Camera" destination="ImagePlane" displayName="Projection Matrix">
+                <Description>
+                    <h:p>The desired projection matrix</h:p>
+                </Description>
+                <Predicate>type=='3x4Matrix'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="Projection3x4"/>
+        </DataflowConfiguration>
+    </Pattern>
+        
+    <Pattern name="StereoRendering" displayName="Renderer: Stereo View">
+        <Description>
+            <h:p>Component for stereo rendering.</h:p>
+        </Description>
+        
+        <Output>
+            <Node name="Camera" displayName="Camera">
+                <Attribute name="stereoOffset" displayName="Stereo offset" default="0.0" xsi:type="DoubleAttributeDeclarationType">
+                    <Description>
+                        <h:p>Inter-pupillary distance -- if you don't provide a separate projection matrix for each eye.</h:p>
+                    </Description>
+                </Attribute>
+                <Attribute name="stereoType" displayName="Stereo mode" default="redGreen" xsi:type="EnumAttributeDeclarationType">
+                    <Description>
+                        <h:p>Type of stereo display</h:p>
+                    </Description>
+                    <EnumValue name="lineSequential" displayName="line sequential"/>
+                    <EnumValue name="frameSequential" displayName="frame sequential"/>
+                    <EnumValue name="redGreen" displayName="red/green"/>
+                    <EnumValue name="redBlue" displayName="red/blue"/>
+                </Attribute>
+            </Node>
+            <Node name="LeftImagePlane" displayName="Left Image Plane">
+                <Attribute name="eyeSide" displayName="side of the eye" default="left" xsi:type="EnumAttributeDeclarationType">
+                    <Description>
+                        <h:p>Which side is the eye?</h:p>
+                    </Description>
+                    <EnumValue name="left" displayName="left"/>
+                </Attribute>
+            </Node>
+            <Node name="RightImagePlane" displayName="Right Image Plane">
+                <Attribute name="eyeSide" displayName="side of the eye" default="right" xsi:type="EnumAttributeDeclarationType">
+                    <Description>
+                        <h:p>Which side is the eye?</h:p>
+                    </Description>
+                    <EnumValue name="right" displayName="right"/>
+                </Attribute>
+            </Node>
+        </Output>
+        <DataflowConfiguration>
+            <UbitrackLib class="StereoRendering"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="StereoSeparation" displayName="Renderer: Stereo View Difference">
+        <Description>
+            <h:p>This component alternatingly creates a pose from a base pose and two offsets.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="World" displayName="World"/>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="LeftOffset" displayName="Left Offset"/>
+            <Node name="RightOffset" displayName="Right Offset"/>
+            <Node name="CurrentPose" displayName="Current Pose"/>
+            
+            <Edge name="PushInput" source="World" destination="Camera" displayName="Base Pose (Push)">
+                <Description>
+                    <h:p>The base position</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+            <Edge name="PullInput" source="World" destination="Camera" displayName="Base Pose (Pull)">
+                <Description>
+                    <h:p>The base position</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+            
+            <Edge name="PushInputA" source="Camera" destination="LeftOffset" displayName="Left Offset (Push)">
+                <Description>
+                    <h:p>The left offset</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+            <Edge name="PullInputA" source="Camera" destination="LeftOffset" displayName="Left Offset (Pull)">
+                <Description>
+                    <h:p>The left offset</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+            
+            <Edge name="PushInputB" source="Camera" destination="RightOffset" displayName="Right Offset (Push)">
+                <Description>
+                    <h:p>The right offset</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+            <Edge name="PullInputB" source="Camera" destination="RightOffset" displayName="Right Offset (Pull)">
+                <Description>
+                    <h:p>The right offset</h:p>
+                </Description>
+                <Predicate>type=='6D'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+            
+        </Input>
+        
+        <Output>
+            <Edge name="Output" source="World" destination="CurrentPose" displayName="Camera pose for current frame">
+                <Description>
+                    <h:p>The camera pose for the current frame.</h:p>
+                </Description>
+                <Attribute name="type" value="6D" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="mode" value="push" xsi:type="EnumAttributeReferenceType"/>
+            </Edge>
+        </Output>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="StereoSeparation"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="ImageOutput" displayName="Renderer: Augmented Video Output">
+        <Description>
+            <h:p>This component pushes every completed frame as an image.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+        </Input>
+        
+        <Output>
+            <Edge name="Output" source="Camera" destination="ImagePlane" displayName="Augmented Image">
+                <Description>
+                    <h:p>The completed image.</h:p>
+                </Description>
+                <Attribute name="type" value="Image" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="mode" value="push" xsi:type="EnumAttributeReferenceType"/>
+            </Edge>
+        </Output>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="ImageOutput"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="ZBufferOutput" displayName="Renderer: Z Buffer Image Output">
+        <Description>
+            <h:p>This component pushes the z buffer of every completed frame as an image.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+        </Input>
+        
+        <Output>
+            <Edge name="Output" source="Camera" destination="ImagePlane" displayName="Z Buffer Image">
+                <Description>
+                    <h:p>The z buffer of the completed image.</h:p>
+                </Description>
+                <Attribute name="type" value="Image" xsi:type="EnumAttributeReferenceType"/>
+                <Attribute name="mode" value="push" xsi:type="EnumAttributeReferenceType"/>
+            </Edge>
+        </Output>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="ZBufferOutput"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="BackgroundImage" displayName="Renderer: Background Video">
+        <Description>
+            <h:p>This component takes an image and displays it into the background of the output window.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Edge name="Image1" source="Camera" destination="ImagePlane" displayName="Background Image">
+                <Description>
+                    <h:p>The left background image (default if only one is present).</h:p>
+                </Description>
+                <Predicate>type=='Image'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="BackgroundImage"/>
+            <Attribute name="useTexture" displayName="use background texture" default="true" xsi:type="StringAttributeDeclarationType">
+				<!-- Why is there no BooleanAttributeDeclarationType!? -->
+                <Description>
+                    <h:p>Use background texture (true/false). If false,
+                        <h:tt>glDrawPixels</h:tt> is used instead.
+                    </h:p>
+                </Description>
+            </Attribute>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="PoseErrorVisualization" displayName="Renderer: Visualization of Pose Errors">
+        <Description>
+            <h:p>This component displays the covariance ellipsoids for a pose error.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Node name="ErrorSource" displayName="Error Source">
+                <Description>
+                    <p xmlns="http://www.w3.org/1999/xhtml">Source node for error</p>
+                </Description>
+            </Node>
+            <Edge name="PushInput" displayName="Pose input" source="Camera" destination="Object">
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+            <Edge name="ErrorInput" source="ErrorSource" destination="Object" displayName="Error Pose">
+                <Description>
+                    <h:p>The error pose</h:p>
+                </Description>
+                <Predicate>type=='6DError'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="PoseErrorVisualization"/>
+            <Attribute name="scaling" displayName="Error Scale Factor" default="3.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Scale factor for the error ellipsoids.</h:p>
+                </Description>
+            </Attribute>
+            <Attribute name="axisLength" displayName="Axis Length" default="0.1" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Distance from origin to error ellipsoids.</h:p>
+                </Description>
+            </Attribute>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="PositionErrorVisualization" displayName="Renderer: Visualization of Position Errors">
+        <Description>
+            <h:p>This component displays the covariance ellipsoid for a position error.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="Object" displayName="Object"/>
+            <Node name="ErrorSource" displayName="Error Source">
+                <Description>
+                    <p xmlns="http://www.w3.org/1999/xhtml">Source node for error</p>
+                </Description>
+            </Node>
+            <Edge name="PushInput" displayName="Pose input" source="Camera" destination="Object">
+                <Predicate>type=='6D'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+            <Edge name="ErrorInput" source="ErrorSource" destination="Object" displayName="Error Position">
+                <Description>
+                    <h:p>The error position</h:p>
+                </Description>
+                <Predicate>type=='3DPositionError'&amp;&amp;mode=='push'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="PositionErrorVisualization"/>
+            <Attribute name="scaling" displayName="Error Scale Factor" default="3.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Scale factor for the error ellipsoid.</h:p>
+                </Description>
+            </Attribute>
+        </DataflowConfiguration>
+    </Pattern>
+    
+    
+    <Pattern name="Cross2D" displayName="Renderer: 2D Crosshair">
+        <Description>
+            <h:p>This component displays a 2D crosshair for HMD calibration.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera">
+                <Description>
+                    <h:p>Drag this node onto the VirtualCameraSettings node of which you want to receive signal events.</h:p>
+                </Description>
+            </Node>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Node name="Cross" displayName="Cross"/>
+            <Edge name="Input" source="ImagePlane" destination="Cross" displayName="Cross Position">
+                <Description>
+                    <h:p>The 2D cross hair position</h:p>
+                </Description>
+                <Predicate>type=='2DPosition'</Predicate>
+            </Edge>
+        </Input>
+        
+        <Constraints>
+            <TriggerGroup>
+                <Edge edge-ref="Input"/>
+            </TriggerGroup>
+        </Constraints>
+
+        <DataflowConfiguration>
+            <UbitrackLib class="Cross2D"/>
+        </DataflowConfiguration>
+    </Pattern>
+    
+        
+    <!-- Attribute declarations -->
+	
+    <GlobalNodeAttributeDeclarations>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/1/1)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/1/2)"/>
+    </GlobalNodeAttributeDeclarations>
+    
+    <GlobalEdgeAttributeDeclarations>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/1)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/2)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/3)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/4)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/5)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/6)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/7)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/2/8)"/>
+    </GlobalEdgeAttributeDeclarations>
+    
+    <GlobalDataflowAttributeDeclarations>
+        <!-- Unfortunately, the xpointer used in Xinclude is currently restricted to the element scheme and absolute element indices in Xerces (and thus XMLBeans) -->
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/1)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/2)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/3)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/4)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/5)"/>
+        <xi:include href="file:GlobalAttrSpec.xml" xpointer="element(/1/3/6)"/>
+    </GlobalDataflowAttributeDeclarations>
+    
+</UTQLPatternTemplates>
