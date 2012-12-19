@@ -32,8 +32,8 @@ configHelper = standardLibConfig(libName, libFinder)
 
 glut_options = configHelper.getLibraryOptions()
 have_freeglut = configHelper.haveLib()
-
+have_glut = have_freeglut
 
 
 # export results
-Export( [ 'have_freeglut', 'glut_options'] )
+Export( [ 'have_freeglut', 'glut_options', 'have_glut'] )

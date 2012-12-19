@@ -5,7 +5,7 @@ Import( '*' )
 # create a common build environment for all drivers
 utVisualizationEnv = masterEnv.Clone()
 
-utVisualizationEnv.AppendUnique( **mergeOptions( utcore_options, utdataflow_options, boost_options, tinyxml_options, log4cpp_options, utvision_options, opencv_options ) )
+utVisualizationEnv.AppendUnique( **mergeOptions( utdataflow_all_options, utvision_all_options ) )
 utVisualizationEnv.AppendUnique( LIBS = boost_libs( [ 'thread' ] ) )
 utVisualizationEnv.Replace( no_import_lib = 1 )
 

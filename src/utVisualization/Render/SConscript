@@ -38,17 +38,7 @@ else:
 		sources.remove('PoseErrorVisualization.cpp')
 		headers.remove('PositionErrorVisualization.h')
 		headers.remove('PoseErrorVisualization.h')
-		
-
-	if have_coin:
-		env.AppendUnique( **coin_options )
-	else:
-		sources.remove('InventorObject.cpp')
-		headers.remove('InventorObject.h')
-
-	if have_glew:
-		env.AppendUnique( **glew_options )
-
+			
 
 	# setup compiler and linker flags	
 	env.AppendUnique( **glut_options )	
