@@ -6,7 +6,7 @@ Import( '*' )
 utVisualizationEnv = masterEnv.Clone()
 
 utVisualizationEnv.AppendUnique( **mergeOptions( utdataflow_all_options, utvision_all_options ) )
-utVisualizationEnv.AppendUnique( LIBS = boost_libs( [ 'thread' ] ) )
+utVisualizationEnv.AppendUnique( LIBS = boost_libs( [ 'thread', 'system' ] ) )
 utVisualizationEnv.Replace( no_import_lib = 1 )
 
 Export( 'utVisualizationEnv' )
