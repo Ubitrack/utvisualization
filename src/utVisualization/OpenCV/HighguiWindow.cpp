@@ -36,6 +36,7 @@
 #include <iostream>
 #include <deque>
 
+#include <boost/version.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <boost/function.hpp>
@@ -291,7 +292,11 @@ void HighguiWindowModule::threadProc()
 			{
 				// wait for event or message dispatching timeout
 				boost::xtime xt;
+#if BOOST_VERSION >= 105000
+				boost::xtime_get( &xt, boost::TIME_UTC_ );
+#else
 				boost::xtime_get( &xt, boost::TIME_UTC );
+#endif
 				xt.nsec += 100000000;
 				xt.sec += xt.nsec / 1000000000;
 				xt.nsec %= 1000000000;
