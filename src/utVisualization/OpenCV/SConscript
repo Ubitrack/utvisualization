@@ -17,5 +17,5 @@ else:
 
 
 	# compile driver
-	setupComponentBuild(env, sources, "utVisualization")
+	setupComponentBuild(env, sources, "visualization")
 	

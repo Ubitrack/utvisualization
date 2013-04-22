@@ -33,7 +33,7 @@ if sys.platform == 'win32':
 	env.Append( LIBS = ['Ws2_32.lib'] )
 
 # compile driver
-libs = setupSingleComponentBuild(env, sources, driverName, "utVisualization")
+libs = setupSingleComponentBuild(env, sources, driverName, "visualization")
 
 #copy_files = env.Install( install_components_prefix, [ 'updater.js', 'prototype.js', 'green_light.png', 'yellow_light.png', 'red_light.png' ] )
 

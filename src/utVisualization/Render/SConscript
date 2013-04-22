@@ -44,5 +44,5 @@ else:
 	env.AppendUnique( **glut_options )	
 
 	# compile driver
-	setupSingleComponentBuild(env, sources, driverName, "utVisualization")
+	setupSingleComponentBuild(env, sources, driverName, "visualization")
 	
