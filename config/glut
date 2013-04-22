@@ -13,13 +13,17 @@ opts.Add( 'GLUT_LIBS', 'Path to the glut libraries' )
 
 libName = "GLUT"
 
+libname_glut = ""
+
 compileSettings = []
 if sys.platform == 'darwin':
-	compileSettings =[ {}, "", "GLUT/glut.h", "C++", "glutInitWindowSize( 800, 600 );"]		
+	compileSettings =[ {}, libname_glut, "GLUT/glut.h", "C++", "glutInitWindowSize( 800, 600 );"]		
 else:
+	if sys.platform != "win32":
+		libname_glut = "glut"
 	# prefer freeglut over glut
 	#compileSettings =[ {}, "", "GL/glut.h", "C++", "glutInitWindowSize( 800, 600 );"]		
-	compileSettings =[ {}, "", "GL/freeglut.h", "C++", "glutMainLoopEvent();"]		
+	compileSettings =[ {}, libname_glut, "GL/freeglut.h", "C++", "glutMainLoopEvent();"]		
 	
 	#if conf.CheckLibWithHeader( "freeglut", "GL/glut.h", "C++", "glutInitWindowSize( 800, 600 );", 0 ):
 	#elif conf.CheckLibWithHeader( "glut", "GL/freeglut.h", "C++", "glutMainLoopEvent();", 0 ):
