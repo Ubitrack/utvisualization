@@ -1,6 +1,6 @@
 set(the_description "The UbiTrack Visualization Components")
 configure_file(src/utVisualization/WebGui/config_cmake.h src/utVisualization/WebGui/config.h)
-ut_add_module(utvisualization INTERNAL utcore utdataflow utvision)
-ut_module_include_directories(${TINYXML_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR} ${BOOSTBINDINGS_INCLUDE_DIR} ${LAPACK_INCLUDE_DIR}  ${Boost_INCLUDE_DIR})
+ut_add_module(utvisualization INTERNAL utcore utdataflow utvision ${OPENGL_LIBRARIES} ${Freeglut_LIBRARIES})
+ut_module_include_directories("${CMAKE_CURRENT_BINARY_DIR}/src/utVisualization/WebGui" ${TINYXML_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR} ${BOOSTBINDINGS_INCLUDE_DIR} ${LAPACK_INCLUDE_DIR}  ${Boost_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${Freeglut_INCLUDE_DIR})
 ut_glob_module_sources()
 ut_create_module()
