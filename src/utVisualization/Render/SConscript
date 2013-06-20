@@ -32,7 +32,9 @@ else:
 		headers.remove('ImageOutput.h')
 	
 	if have_lapack:
-		env.AppendUnique( **lapack_options )		
+		env.AppendUnique( **lapack_options )	
+		if sys.platform != "win32":		
+			env.AppendUnique( LIBS = [ 'lapack' ] )
 	else:
 		sources.remove('PositionErrorVisualization.cpp')
 		sources.remove('PoseErrorVisualization.cpp')
@@ -41,8 +43,10 @@ else:
 			
 
 	# setup compiler and linker flags	
-	env.AppendUnique( **glut_options )	
+	env.AppendUnique( **glut_options )
+	if sys.platform != "win32":
+		env.AppendUnique( LIBS = [ 'GL', 'GLU', 'glut' ] )
 
 	# compile driver
-	setupSingleComponentBuild(env, sources, driverName, "utVisualization")
+	setupSingleComponentBuild(env, sources, driverName, "visualization")
 	

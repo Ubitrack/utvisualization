@@ -15,7 +15,9 @@ else:
 	headers = globSourceFiles( '*.h' )
 	sources = globSourceFiles( '*.cpp' )
 
+	if sys.platform != "win32":
+		env.AppendUnique( LIBS = [ 'opencv_highgui' ] )
 
 	# compile driver
-	setupComponentBuild(env, sources, "utVisualization")
+	setupComponentBuild(env, sources, "visualization")
 	

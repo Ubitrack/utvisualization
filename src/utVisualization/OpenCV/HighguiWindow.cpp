@@ -36,6 +36,7 @@
 #include <iostream>
 #include <deque>
 
+#include <boost/version.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/xtime.hpp>
 #include <boost/function.hpp>
@@ -272,8 +273,9 @@ protected:
 	
 	std::vector< int* > m_trackBarValues;
 
-	// more ports
+	/// Image input port
 	Dataflow::PushConsumer< Measurement::ImageMeasurement > m_inPort;
+	/// Button input port
 	Dataflow::PushSupplier< Measurement::Button > m_buttonPort;
 };
 
@@ -291,42 +293,44 @@ void HighguiWindowModule::threadProc()
 			{
 				// wait for event or message dispatching timeout
 				boost::xtime xt;
-
-				#if BOOST_VERSION >= 105000
-					boost::xtime_get( &xt, boost::TIME_UTC_ );
-				#else
-	            	boost::xtime_get( &xt, boost::TIME_UTC );
-				#endif
-				
-
+#if BOOST_VERSION >= 105000
+				boost::xtime_get( &xt, boost::TIME_UTC_ );
+#else
+				boost::xtime_get( &xt, boost::TIME_UTC );
+#endif
 				xt.nsec += 100000000;
 				xt.sec += xt.nsec / 1000000000;
 				xt.nsec %= 1000000000;
 				m_queueCondition.timed_wait( l, xt );
 			}
 
-			if ( !m_queue.empty() )
+			// comment of this change (CW@2013-05-24):
+			// previously there was one highgui function executed
+			// with cvWaitKey(10) after each call. -> lead to a huge
+			// delay when dealing with multiple images/windows at the same time. 
+			// therefore I changed to many calls (until pileline is empty) 
+			// and calling then cvWaitkey, hope that helps and works in common
+			// cases with one camera as well.
+			while ( !m_queue.empty() )
 			{
 				nextCall = m_queue.front();
 				m_queue.pop_front();
+				if ( nextCall ) 
+					nextCall();
 			}
 		}
+		
+		int nKey = cvWaitKey( 5 );
 
-		// execute the queued event
-		if ( nextCall ) 
-		{
-			nextCall();
-			cvWaitKey ( 10 );
-		}
-
-		// let the opencv message dispatching do something
-		int nKey = -1;
+		// let the opencv message dispatching do something		
+#ifndef _WIN32 // added from CW@2013-05-24: since this necessary on linux only, we dont do it on windows
 		if ( m_nWindows ) 
 		{
 			// ATTENTION: has to be at least 2, otherwise highgui does not process any events on Linux. This
 			// has to do with the timed_wait() call above (Pete, 2010-08-17)
 			nKey = cvWaitKey( 2 );
 		}
+#endif
 		
 		// when a button is pushed, signal a button event
 		if ( nKey != -1 )
