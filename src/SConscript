@@ -2,6 +2,11 @@ import glob
 
 Import( '*' )
 
+if not have_utvision or not have_utdataflow:
+	print "utVision or utDataflow missing -- not building vision visualization"
+	success = False
+	Return('success')	
+	
 # create a common build environment for all drivers
 utVisualizationEnv = masterEnv.Clone()
 
