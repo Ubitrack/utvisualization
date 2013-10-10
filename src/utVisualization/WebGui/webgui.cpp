@@ -21,6 +21,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+
+
+#include <boost/version.hpp>
+
+// there is a bug in gcc and boost 1.48.xx
+#if BOOST_VERSION != 104800
+
+
 #include "webgui.h"
 #include "config.h"
 #include <utUtil/Exception.h>
@@ -755,5 +763,6 @@ UBITRACK_REGISTER_COMPONENT( ComponentFactory* const cf )
 	cf->registerModule< WebGuiModule > ( components );
 }
 
-} // namespace Drivers
-} // namespace Ubitrack
+}} // namespace Ubitrack::Drivers
+
+#endif
