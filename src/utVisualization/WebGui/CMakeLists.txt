@@ -1,6 +1,6 @@
 set(the_description "The UbiTrack Visualization WebGui Components")
 configure_file(config_cmake.h config.h)
 ut_add_component(WebGui DEPS utcore utdataflow utvision)
-ut_component_include_directories(${CMAKE_CURRENT_BINARY_DIR} ${TINYXML_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR} ${BOOSTBINDINGS_INCLUDE_DIR} ${LAPACK_INCLUDE_DIR}  ${Boost_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${Freeglut_INCLUDE_DIR})
+ut_component_include_directories(${CMAKE_CURRENT_BINARY_DIR} ${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${Freeglut_INCLUDE_DIR})
 ut_glob_component_sources(HEADERS "*.h" SOURCES "*.cpp" "*.c")
 ut_create_single_component(${OPENGL_LIBRARIES} ${Freeglut_LIBRARIES})
