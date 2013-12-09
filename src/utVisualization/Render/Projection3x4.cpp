@@ -71,7 +71,7 @@ void Projection3x4::draw( Measurement::Timestamp& time, int parity )
 void Projection3x4::inputIn( const Measurement::Matrix3x4& m, int redraw )
 {
 	m_lastUpdateTime = m.time();
-	Math::Matrix< 3, 4 > mat3x4( *(m.get()) );
+	Math::Matrix< double, 3, 4 > mat3x4( *(m.get()) );
 	
 	// convert 3x4 to 4x4 matrix
 	m_projection = Calibration::projectionMatrixToOpenGL( 0, m_pModule->m_width, 0, m_pModule->m_height, m_pModule->m_near, m_pModule->m_far, mat3x4 );

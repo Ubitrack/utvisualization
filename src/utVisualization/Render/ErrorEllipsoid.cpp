@@ -46,7 +46,7 @@ namespace lapack = boost::numeric::bindings::lapack;
 
 namespace Ubitrack { namespace Drivers {
 
-ErrorEllipsoid::ErrorEllipsoid( const Math::Vector< 3 >& position, double scaling )
+ErrorEllipsoid::ErrorEllipsoid( const Math::Vector< double, 3 >& position, double scaling )
 	: m_position( position )
 	, m_scaling( scaling )
 	, m_rotation( ublas::identity_matrix< double >( 4, 4 ) )
@@ -77,10 +77,10 @@ void ErrorEllipsoid::draw()
 }
 
 
-void ErrorEllipsoid::setCovariance( const Math::Matrix< 3, 3 >& covariance )
+void ErrorEllipsoid::setCovariance( const Math::Matrix< double, 3, 3 >& covariance )
 {
 	ublas::subrange( m_rotation, 0, 3, 0, 3 ) = covariance;
-	ublas::matrix_range< Math::Matrix< 4, 4 > > upperLeft( m_rotation, ublas::range( 0, 3 ), ublas::range( 0, 3 ) );
+	ublas::matrix_range< Math::Matrix< double, 4, 4 > > upperLeft( m_rotation, ublas::range( 0, 3 ), ublas::range( 0, 3 ) );
 	lapack::syev( 'V', 'U', upperLeft, m_sizes, lapack::minimal_workspace() );
 	for ( unsigned i = 0; i < 3; i++ )
 		if ( m_sizes( i ) > 0 )

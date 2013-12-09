@@ -63,7 +63,7 @@ protected:
 	 */
 	void inputIn( const Measurement::Matrix4x4& m, int redraw );
 
-	Ubitrack::Math::Matrix< 4, 4 > m_projection;
+	Ubitrack::Math::Matrix< double, 4, 4 > m_projection;
 
 	boost::scoped_ptr< PushConsumer< Measurement::Matrix4x4 > > m_pPush;
 	boost::scoped_ptr< PullConsumer< Measurement::Matrix4x4 > > m_pPull;

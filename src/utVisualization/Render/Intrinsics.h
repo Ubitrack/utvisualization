@@ -56,7 +56,7 @@ protected:
 	double m_calibWidth;
 	double m_calibHeight;
 
-	Ubitrack::Math::Matrix< 3, 3 > m_intrinsics;
+	Ubitrack::Math::Matrix< double, 3, 3 > m_intrinsics;
 	PullConsumer< Ubitrack::Measurement::Matrix3x3 > m_port;
 };
 

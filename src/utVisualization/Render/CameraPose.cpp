@@ -59,7 +59,7 @@ void CameraPose::poseIn( const Ubitrack::Measurement::Pose& pose, int redraw )
 {
 	m_lastUpdateTime = pose.time();
 	Ubitrack::Math::Pose invpose = ~(*pose);
-	Ubitrack::Math::Matrix<4,4> m( invpose.rotation(), invpose.translation() );
+	Ubitrack::Math::Matrix< double, 4, 4 > m( invpose.rotation(), invpose.translation() );
 	double* tmp =  m.content();
 
 	boost::mutex::scoped_lock l( m_poseLock );

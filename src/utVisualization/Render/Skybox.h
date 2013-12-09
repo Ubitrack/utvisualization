@@ -260,7 +260,7 @@ protected:
 	void poseIn( const Ubitrack::Measurement::Rotation& pose, int redraw )
 	{
 		m_lastUpdateTime = pose.time();
-		Ubitrack::Math::Matrix<3,3> m( *pose);
+		Ubitrack::Math::Matrix< double, 3, 3 > m( *pose);
 		double* tmp =  m.content();
 
 		boost::mutex::scoped_lock l( m_poseLock );

@@ -87,8 +87,8 @@ void PointCloud::draw( Measurement::Timestamp&, int parity )
 	glEnableClientState(GL_VERTEX_ARRAY);
 	for ( unsigned int i = 0; i < m_data.size(); i++ )
 	{
-		std::vector< Math::Vector<3> >* ptr = m_data[i].get();
-		glVertexPointer( 3, GL_DOUBLE, sizeof(Math::Vector<3>), (*ptr)[0].data().begin() );
+		std::vector< Math::Vector< double, 3 > >* ptr = m_data[i].get();
+		glVertexPointer( 3, GL_DOUBLE, sizeof(Math::Vector< double, 3 >), (*ptr)[0].data().begin() );
 		glDrawArrays( GL_POINTS, 0, m_data[i]->size() );
 	}
 }

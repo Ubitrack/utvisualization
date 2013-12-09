@@ -138,7 +138,7 @@ public:
 	VirtualCameraKey( boost::shared_ptr< Graph::UTQLSubgraph > subgraph )
 		: NodeIdKey( subgraph, "Camera" )
 		, m_bFullscreen( false )
-		, m_monitorPoint( Math::Vector< 2, int >( 0, 0 ) )
+		, m_monitorPoint( Math::Vector< int, 2 >( 0, 0 ) )
 		, m_bEnableStencil( false )
 	{
 		// some sane defaults
@@ -172,7 +172,7 @@ public:
 	int m_width, m_height;
 	
 	bool m_bFullscreen;
-	Math::Vector< 2, int > m_monitorPoint;
+	Math::Vector< int, 2 > m_monitorPoint;
 	
 	std::string m_sGameMode;
 	
@@ -257,7 +257,7 @@ public:
 	unsigned char getLastKey();
 
 	/** button output helper function */
-	Math::Vector< 2 > getLastMousePos();
+	Math::Vector< double, 2 > getLastMousePos();
 
 	/** GLUT reshape callback */
 	void reshape( int w, int h );
@@ -297,7 +297,7 @@ protected:
 
 	int m_winHandle, m_redraw, m_doSync, m_parity, m_info, m_lasttime, m_lastframe;
 	unsigned char m_lastKey;
-	Math::Vector< 2 > m_lastMousePos;
+	Math::Vector< double, 2 > m_lastMousePos;
 	double m_fps;
 	Measurement::Timestamp m_lastRedrawTime;
 

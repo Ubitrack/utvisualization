@@ -69,10 +69,10 @@ protected:
 	void dataIn( const Ubitrack::Measurement::Position& pos, int redraw );
 
 	/// target position pushed measurement
-	Math::Vector< 3 > m_target_position;
+	Math::Vector< double, 3 > m_target_position;
 
 	/// source position pulled measurement
-	Math::Vector< 3 > m_source_position;
+	Math::Vector< double, 3 > m_source_position;
 
 	boost::mutex m_lock;
 

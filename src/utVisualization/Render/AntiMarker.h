@@ -73,7 +73,7 @@ protected:
 	// positionlist input
 	PushConsumer< Ubitrack::Measurement::PositionList2 > m_push;
 
-	std::vector< Math::Vector<2> > m_data;
+	std::vector< Math::Vector< double, 2 > > m_data;
 	boost::mutex m_posLock;
 	double m_factor;
 };
