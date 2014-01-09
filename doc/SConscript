@@ -1,6 +1,6 @@
-import os
-import glob
-Import( '*' )
+#general script to install utql pattern files and additional files to doc folder
+
+Import( 'masterEnv', 'setupDocInstall' )
 
 env = masterEnv.Clone()
 setupDocInstall(env, 'utql', 'utql') 

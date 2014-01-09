@@ -283,7 +283,7 @@ int VirtualCamera::setup()
 	if ( m_moduleKey.m_bFullscreen )
 		#ifdef	_WIN32
 			{
-			Math::Vector< 2, int > newSize = makeWindowFullscreen( m_moduleKey, m_moduleKey.m_monitorPoint );
+			Math::Vector< int, 2 > newSize = makeWindowFullscreen( m_moduleKey, m_moduleKey.m_monitorPoint );
 			m_width = newSize( 0 );
 			m_height = newSize( 1 );
 			}
@@ -504,7 +504,7 @@ void VirtualCamera::keyboard( unsigned char key, int x, int y )
 			case 'f': 
 				#ifdef	_WIN32
 					// need to work around freeglut for multi-monitor fullscreen
-					makeWindowFullscreen( m_moduleKey, Math::Vector< 2, int >( 0xFFFF, 0xFFFF ) );
+					makeWindowFullscreen( m_moduleKey, Math::Vector< int, 2 >( 0xFFFF, 0xFFFF ) );
 				#else
 					glutFullScreen();
 				#endif
@@ -519,9 +519,9 @@ void VirtualCamera::keyboard( unsigned char key, int x, int y )
 	{
 		m_lastKey = key;
 		if ( x < 0 || y < 0 || x > m_width || y > m_height )
-			m_lastMousePos = Math::Vector< 2 >( 0.5, 0.5 );
+			m_lastMousePos = Math::Vector< double, 2 >( 0.5, 0.5 );
 		else
-			m_lastMousePos = Math::Vector< 2 >( double( x ) / m_width, double( y ) / m_height );
+			m_lastMousePos = Math::Vector< double, 2 >( double( x ) / m_width, double( y ) / m_height );
 	}
 	glutPostRedisplay();
 }
@@ -534,7 +534,7 @@ unsigned char VirtualCamera::getLastKey() {
 }
 
 
-Math::Vector< 2 > VirtualCamera::getLastMousePos() {
+Math::Vector< double, 2 > VirtualCamera::getLastMousePos() {
 	return m_lastMousePos;
 }
 

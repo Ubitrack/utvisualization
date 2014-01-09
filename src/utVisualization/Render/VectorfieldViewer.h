@@ -56,8 +56,8 @@ public:
 protected:
 
 	// X3D parsing/rendering
-	std::vector< Math::Vector<3> > m_pos;
-	std::vector< Math::Vector<3> > m_val;
+	std::vector< Math::Vector< double, 3 > > m_pos;
+	std::vector< Math::Vector< double, 3 > > m_val;
 };
 
 

@@ -36,7 +36,7 @@ namespace Ubitrack { namespace Drivers {
  * @param monitorPoint point on the monitor on which the window wants to be maximized
  * @return new window size
  */
-Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, const Math::Vector< 2, int >& monitorPoint );
+Math::Vector< int, 2 > makeWindowFullscreen( const std::string& sWindowName, const Math::Vector< int, 2 >& monitorPoint );
 
 } } // namespace Ubitrack::Drivers
 

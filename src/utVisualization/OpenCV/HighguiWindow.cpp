@@ -360,7 +360,7 @@ void on_mouse( int event, int x, int y, int flags, void* param )
 	case CV_EVENT_FLAG_LBUTTON:
         {
 			Ubitrack::Drivers::HighguiWindow* wind = static_cast< Ubitrack::Drivers::HighguiWindow* > ( param );
-			Math::Vector< 2 > cursor ( x, y );
+			Math::Vector< double, 2 > cursor ( x, y );
 			Ubitrack::Measurement::Timestamp t = Ubitrack::Measurement::now();
 			wind->m_positionPort.send( Ubitrack::Measurement::Position2D( t, cursor ) );
 		}

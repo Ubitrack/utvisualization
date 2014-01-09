@@ -49,10 +49,10 @@ VectorfieldViewer::VectorfieldViewer( const std::string& name, boost::shared_ptr
 	while (field) {
 		field >> tmp1 >> dx >> dy >> dz >> tmp2;
 		if ((tmp1 != '[') || (tmp2 != ']')) UBITRACK_THROW( "Vectorfield parse error" );
-		m_pos.push_back( Math::Vector<3>(dx,dy,dz) );
+		m_pos.push_back( Math::Vector< double, 3 >(dx,dy,dz) );
 		field >> tmp1 >> dx >> dy >> dz >> tmp2;
 		if ((tmp1 != '[') || (tmp2 != ']')) UBITRACK_THROW( "Vectorfield parse error" );
-		m_val.push_back( Math::Vector<3>(dx,dy,dz) );
+		m_val.push_back( Math::Vector< double, 3 >(dx,dy,dz) );
 	}
 }
 

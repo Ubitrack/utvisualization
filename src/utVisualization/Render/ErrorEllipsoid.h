@@ -50,7 +50,7 @@ public:
 	 * @param position the position of the ellipsoid
 	 * @param scaling the scaling of the ellipsoid in multiples of sigma
 	 */
-	ErrorEllipsoid( const Math::Vector< 3 >& position = Math::Vector< 3 >( 0, 0, 0 ), double scaling = 3.0 );
+	ErrorEllipsoid( const Math::Vector< double, 3 >& position = Math::Vector< double, 3 >( 0, 0, 0 ), double scaling = 3.0 );
 
 	/** destructor */
 	~ErrorEllipsoid();
@@ -58,13 +58,13 @@ public:
 	/**
 	 * sets the covariance matrix
 	 */
-	void setCovariance( const Math::Matrix< 3, 3 >& covariance );
+	void setCovariance( const Math::Matrix< double, 3, 3 >& covariance );
 
 	/** renders the ellipsoid */
 	void draw();
 
 	/** returns the position */
-	const Math::Vector< 3 >& position() const
+	const Math::Vector< double, 3 >& position() const
 	{ return m_position; }
 
 	/** sets the scaling */
@@ -72,16 +72,16 @@ public:
 	{ m_scaling = scaling; }
 
 	/** sets the position */
-	void setPosition( const Math::Vector< 3 >& position )
+	void setPosition( const Math::Vector< double, 3 >& position )
 	{ m_position = position; }
 
 protected:
-	Math::Vector< 3 > m_position;
+	Math::Vector< double, 3 > m_position;
 	double m_scaling;
 
 	// result of the decomposition
-	Math::Vector< 3 > m_sizes;
-	Math::Matrix< 4, 4 > m_rotation;
+	Math::Vector< double, 3 > m_sizes;
+	Math::Matrix< double, 4, 4 > m_rotation;
 
 	GLUquadricObj* m_pQuadric;
 };

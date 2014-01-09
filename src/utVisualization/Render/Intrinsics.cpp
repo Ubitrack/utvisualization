@@ -56,7 +56,7 @@ void Intrinsics::draw( Measurement::Timestamp& time, int parity )
 	// create a perspective projection matrix
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	Math::Matrix< 4, 4 > m = Ubitrack::Calibration::projectionMatrixToOpenGL( l, r, b, t, n, f, m_intrinsics );
+	Math::Matrix< double, 4, 4 > m = Ubitrack::Calibration::projectionMatrixToOpenGL( l, r, b, t, n, f, m_intrinsics );
 	glMultMatrixd( m.content() );
 	glMatrixMode( GL_MODELVIEW );
 }

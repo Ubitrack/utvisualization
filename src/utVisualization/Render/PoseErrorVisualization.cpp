@@ -51,7 +51,7 @@ namespace {
 /**
  * Computes the jacobian for converting the rotational error into a position ellipsoid
  */
-void rotErrorJacobian( Math::Matrix< 3, 3 >& j, const Math::Vector< 3 >& pos )
+void rotErrorJacobian( Math::Matrix< double, 3, 3 >& j, const Math::Vector< double, 3 >& pos )
 {
 	j( 0, 0 ) = 0.0;
 	j( 0, 1 ) = 2 * pos( 2 );
@@ -82,9 +82,9 @@ PoseErrorVisualization::PoseErrorVisualization( const std::string& name, boost::
 	m_rotYEllipsoid.setScaling( scaling );
 	m_rotZEllipsoid.setScaling( scaling );
 
-	m_rotXEllipsoid.setPosition( Math::Vector< 3 >( axisLength, 0, 0 ) );
-	m_rotYEllipsoid.setPosition( Math::Vector< 3 >( 0, axisLength, 0 ) );
-	m_rotZEllipsoid.setPosition( Math::Vector< 3 >( 0, 0, axisLength ) );
+	m_rotXEllipsoid.setPosition( Math::Vector< double, 3 >( axisLength, 0, 0 ) );
+	m_rotYEllipsoid.setPosition( Math::Vector< double, 3 >( 0, axisLength, 0 ) );
+	m_rotZEllipsoid.setPosition( Math::Vector< double, 3 >( 0, 0, axisLength ) );
 }
 
 
@@ -155,9 +155,9 @@ void PoseErrorVisualization::receiveError( const Ubitrack::Measurement::ErrorPos
 	boost::mutex::scoped_lock l( m_poseLock );
 
 	// rotate the position covariance into the target coordinate frame
-	Matrix< 3, 3 > j( ~error->rotation() );
-	Matrix< 3, 3 > tmp( ublas::prod( j, ublas::subrange( error->covariance(), 0, 3, 0, 3 ) ) );
-	Matrix< 3, 3 > posError( ublas::prod( tmp, ublas::trans( j ) ) );
+	Matrix< double, 3, 3 > j( ~error->rotation() );
+	Matrix< double, 3, 3 > tmp( ublas::prod( j, ublas::subrange( error->covariance(), 0, 3, 0, 3 ) ) );
+	Matrix< double, 3, 3 > posError( ublas::prod( tmp, ublas::trans( j ) ) );
 
 	LOG4CPP_TRACE( logger, "Position error: " << std::endl << posError );
 	m_posEllipsoid.setCovariance( posError );

@@ -40,7 +40,7 @@ static log4cpp::Category& logger( log4cpp::Category::getInstance( "Drivers.Rende
 
 namespace Ubitrack { namespace Drivers {	
 
-Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, const Math::Vector< 2, int >& monitorPoint )
+Math::Vector< int, 2 > makeWindowFullscreen( const std::string& sWindowName, const Math::Vector< int, 2 >& monitorPoint )
 {
 #ifdef _WIN32
 	// first, find the window
@@ -48,7 +48,7 @@ Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, con
 	if ( !hWnd )
 	{
 		LOG4CPP_ERROR( logger, "No window found having name \"" << sWindowName << "\"" );
-		return Math::Vector< 2, int >( 640, 480 );
+		return Math::Vector< int, 2 >( 640, 480 );
 	}
 	
 	// now find the monitor
@@ -64,7 +64,7 @@ Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, con
 	if ( !hMonitor)
 	{
 		LOG4CPP_ERROR( logger, "No monitor found at " << monitorPoint );
-		return Math::Vector< 2, int >( 640, 480 );
+		return Math::Vector< int, 2 >( 640, 480 );
 	}
 
 	// get monitor size
@@ -72,7 +72,7 @@ Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, con
 	monitorInfo.cbSize = sizeof( monitorInfo );
 	GetMonitorInfo( hMonitor, &monitorInfo );
 	RECT& rcMon = monitorInfo.rcMonitor;
-	Math::Vector< 2, int > monitorSize( rcMon.right - rcMon.left, rcMon.bottom - rcMon.top );
+	Math::Vector< int, 2 > monitorSize( rcMon.right - rcMon.left, rcMon.bottom - rcMon.top );
 	
 	LOG4CPP_INFO( logger, "Maximizing window " << sWindowName << " on screen " << monitorInfo.szDevice 
 		<< ", topLeft=(" << rcMon.left << "," << rcMon.top
@@ -96,7 +96,7 @@ Math::Vector< 2, int > makeWindowFullscreen( const std::string& sWindowName, con
 	return monitorSize;
 #else
 	// dummy
-	return Math::Vector< 2, int >( 640, 480 );
+	return Math::Vector< int, 2 >( 640, 480 );
 #endif
 
 }
