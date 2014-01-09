@@ -50,7 +50,7 @@ public:
 	 * @param position the position of the ellipsoid
 	 * @param scaling the scaling of the ellipsoid in multiples of sigma
 	 */
-	ErrorEllipsoid( const Math::Vector< double, 3 >& position = Math::Vector< double, 3 >( 0, 0, 0 ), double scaling = 3.0 );
+	ErrorEllipsoid( const Math::Vector< double, 3 >& position = ( Math::Vector< double, 3 >( 0, 0, 0 ) ), double scaling = 3.0 );
 
 	/** destructor */
 	~ErrorEllipsoid();
