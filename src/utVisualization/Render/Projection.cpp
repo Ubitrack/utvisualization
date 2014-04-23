@@ -22,7 +22,7 @@
  */
 
 #include "Projection.h"
-#include <utCalibration/Projection.h>
+#include <utAlgorithm/Projection.h>
 
 namespace Ubitrack { namespace Drivers {
 

@@ -22,7 +22,7 @@
  */
 
 #include "Projection3x4.h"
-#include <utCalibration/Projection.h>
+#include <utAlgorithm/Projection.h>
 
 namespace Ubitrack { namespace Drivers {
 
@@ -74,7 +74,7 @@ void Projection3x4::inputIn( const Measurement::Matrix3x4& m, int redraw )
 	Math::Matrix< double, 3, 4 > mat3x4( *(m.get()) );
 	
 	// convert 3x4 to 4x4 matrix
-	m_projection = Calibration::projectionMatrixToOpenGL( 0, m_pModule->m_width, 0, m_pModule->m_height, m_pModule->m_near, m_pModule->m_far, mat3x4 );
+	m_projection = Algorithm::projectionMatrixToOpenGL( 0, m_pModule->m_width, 0, m_pModule->m_height, m_pModule->m_near, m_pModule->m_far, mat3x4 );
 	
 	// the pose has changed, so redraw the world
 	if (redraw) m_pModule->invalidate();
