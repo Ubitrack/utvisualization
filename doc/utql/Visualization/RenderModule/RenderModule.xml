@@ -475,7 +475,40 @@
     </Pattern>
 
 
-    <Pattern name="Intrinsics" displayName="Renderer: Intrinsic Camera Parameters">
+    <Pattern name="Intrinsics" displayName="Deprecated: Renderer: Intrinsic Camera Parameters">
+        <Description>
+            <h:p>This version of the pattern is old fashioned. Please use the new pattern with the directed edge pointing in the opposite direction.
+			This component modifies the virtual camera projection matrix to match a previously calibrated matrix.</h:p>
+        </Description>
+        
+        <Input>
+            <Node name="Camera" displayName="Camera"/>
+            <Node name="ImagePlane" displayName="Image Plane"/>
+            <Edge name="Intrinsics" source="Camera" destination="ImagePlane" displayName="Intrinsic Matrix">
+                <Description>
+                    <h:p>The intrinsic camera matrix</h:p>
+                </Description>
+                <Predicate>type=='3x3Matrix'&amp;&amp;mode=='pull'</Predicate>
+            </Edge>
+        </Input>
+        
+        <DataflowConfiguration>
+            <UbitrackLib class="Intrinsics"/>
+            <Attribute name="calibWidth" displayName="Calibration Image Width" default="320.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Width of image at calibration time.</h:p>
+                </Description>
+            </Attribute>
+            <Attribute name="calibHeight" displayName="Calibration Image Height" default="240.0" xsi:type="DoubleAttributeDeclarationType">
+                <Description>
+                    <h:p>Height of image at calibration time.</h:p>
+                </Description>
+            </Attribute>
+        </DataflowConfiguration>
+    </Pattern>
+	
+	
+	<Pattern name="RendererIntrinsics" displayName="Renderer: Intrinsic Camera Parameters">
         <Description>
             <h:p>This component modifies the virtual camera projection matrix to match a previously calibrated matrix.</h:p>
         </Description>
@@ -483,7 +516,7 @@
         <Input>
             <Node name="Camera" displayName="Camera"/>
             <Node name="ImagePlane" displayName="Image Plane"/>
-            <Edge name="Intrinsics" source="Camera" destination="ImagePlane" displayName="Intrinsic Matrix">
+            <Edge name="Intrinsics" source="ImagePlane" destination="Camera" displayName="Intrinsic Matrix">
                 <Description>
                     <h:p>The intrinsic camera matrix</h:p>
                 </Description>
