@@ -40,6 +40,9 @@ if not (have_utdataflow and have_utvision and have_freeglut):
 headers = globSourceFiles( '*.h' )
 sources = globSourceFiles( '*.cpp' )
 
+# should be configurable to select GLFW instead
+sources.append('RenderGLUT/RenderModule.cpp')
+
 renderer_options = mergeOptions( utdataflow_all_options, utvision_all_options, glut_options ) 
 env = masterEnv.Clone()
 env.AppendUnique(**renderer_options)
