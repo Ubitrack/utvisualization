@@ -30,6 +30,7 @@
 #include <GLFW/glfw3.h>
 
 #include "RenderModule.h"
+#include "tools.h"
 
 log4cpp::Category& logger( log4cpp::Category::getInstance( "Drivers.Render" ) );
 log4cpp::Category& loggerEvents( log4cpp::Category::getInstance( "Ubitrack.Events.Drivers.Render" ) );
@@ -80,7 +81,10 @@ namespace Ubitrack { namespace Drivers {
 
 using namespace Dataflow;
 
-
+struct VirtualCameraPrivate
+{
+	bool m_initialized;
+};
 
 struct WindowHelper
 {
@@ -89,6 +93,7 @@ struct WindowHelper
 };
 typedef WindowHelper* 	WindowHandle;
 
+int VirtualCamera::m_window_count = 0;
 
 // some unavoidable globals to manage the GLUT main loop and its handlers
 std::deque< VirtualCamera* > g_setup;
@@ -116,17 +121,12 @@ void g_mainloop()
 
 	boost::mutex::scoped_lock lock( g_globalMutex );
 
-	glfwInit();
-
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 //		glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
-	while (!ShouldClose())
+
+	bool  initialized = false;
+	while (!initialized || !ShouldClose())
 	{
 		// are there any setup functions pending?
 		if ( g_setup.size() > 0 ) {
@@ -152,6 +152,7 @@ void g_mainloop()
 			{
 				LOG4CPP_DEBUG( logger, "g_mainloop(): setup() all setup() activities performed" );
 				g_setup_performed.notify_all();
+				initialized = true;
 			}
 		}
 
@@ -223,8 +224,6 @@ void g_mainloop()
 					if (g_modules.empty()) {
 						glfwPollEvents();
 						LOG4CPP_DEBUG(logger, "g_mainloop(): Render thread stopped");
-
-						glfwTerminate();
 						return;
 					}
 				}
@@ -240,8 +239,6 @@ void g_mainloop()
 		
 		LOG4CPP_TRACE( logger, "g_mainloop(): timed_wait finished" );
 	}
-
-	glfwTerminate();
 }
 
 
@@ -274,6 +271,12 @@ void g_error(int a_iError, const char* a_szDiscription)
 	LOG4CPP_ERROR( logger, "GLFW Error occured, Error ID: " << a_iError << ", Description: " << a_szDiscription);
 }
 
+void VirtualCamera::startModule() {
+}
+
+void VirtualCamera::stopModule() {
+}
+
 int VirtualCamera::setup()
 {
     LOG4CPP_DEBUG( logger, "setup(): Starting setup of window for module key " << m_moduleKey );
@@ -302,26 +305,27 @@ int VirtualCamera::setup()
 //		m_winHandle = glutCreateWindow( m_moduleKey.c_str() );
 //	}
 
-	// create new window data:
-	WindowHandle newWindow = new WindowHelper();
-	if (newWindow == NULL)
-		return 0;
+//	// create new window data:
+//	WindowHandle newWindow = new WindowHelper();
+//	if (newWindow == NULL)
+//		return 0;
+//
+//	newWindow->m_pWindow = NULL;
+//
+//	GLFWmonitor* pMonitor = NULL;
+//
+////	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, a_hShare->m_pWindow);  // Window handle is valid, Share its GL Context Data!
+//	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, NULL); // Window handle is invalid, do not share!
+//
+//	if (newWindow->m_pWindow == NULL)
+//	{
+//		LOG4CPP_ERROR( logger, "Error: Could not Create GLFW Window!");
+//		delete newWindow;
+//		return 0;
+//	}
 
-	newWindow->m_pWindow = NULL;
 
-	GLFWmonitor* pMonitor = NULL;
-
-//	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, a_hShare->m_pWindow);  // Window handle is valid, Share its GL Context Data!
-	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, NULL); // Window handle is invalid, do not share!
-
-	if (newWindow->m_pWindow == NULL)
-	{
-		LOG4CPP_ERROR( logger, "Error: Could not Create GLFW Window!");
-		delete newWindow;
-		return 0;
-	}
-
-
+/** FULLSCREEN NOT MIGRATED .
 	// make full screen?
 	if ( m_moduleKey.m_bFullscreen ) {
 #ifdef    _WIN32
@@ -334,19 +338,22 @@ int VirtualCamera::setup()
 #endif
 	}
 
+**/
+
+
 	// GLEW provides access to OpenGL extensions
-#ifdef HAVE_GLEW
-	// Init GLEW for this context:
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		// a problem occured when trying to init glew, report it:
-		LOG4CPP_ERROR( logger, "GLEW Error occured, Description: " <<  glewGetErrorString(err));
-		glfwDestroyWindow(newWindow->m_pWindow);
-		delete newWindow;
-		return 0;
-	}
-#endif
+//#ifdef HAVE_GLEW
+//	// Init GLEW for this context:
+//	GLenum err = glewInit();
+//	if (err != GLEW_OK)
+//	{
+//		// a problem occured when trying to init glew, report it:
+//		LOG4CPP_ERROR( logger, "GLEW Error occured, Description: " <<  glewGetErrorString(err));
+//		glfwDestroyWindow(newWindow->m_pWindow);
+//		delete newWindow;
+//		return 0;
+//	}
+//#endif
 
 
 	// hack for now give every window the next free id.
@@ -487,6 +494,7 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	, m_lastRedrawTime(0)
 	, m_vsync()
 	, m_stereoRenderPasses( stereoRenderNone )
+	, m_camera_private( NULL )
 {
 	LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating module for module key '" << m_moduleKey << "'...");
 
@@ -503,6 +511,7 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	// Most GL implementation do not look kindly on context sharing between threads!
 	if ( g_glfwThread.get() == 0 ) {
 		LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating single GL thread...");
+
 
 		g_glfwThread.reset( new boost::thread( boost::bind( g_mainloop ) ) );
 
@@ -641,7 +650,7 @@ void VirtualCamera::display()
 	glLoadIdentity();
 
 	// calculate fps
-	int curtime = glutGet( GLUT_ELAPSED_TIME );
+	int curtime = (int)(glfwGetTime() * 1000.);
 	if ((curtime - m_lasttime) >= 1000) {
 		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
 		m_lasttime  = curtime;
@@ -686,7 +695,6 @@ void VirtualCamera::display()
 	}
 
 	// print info string
-	/** no text rendering for now
 	if (m_info) {
   
 		std::ostringstream text;
@@ -711,15 +719,15 @@ void VirtualCamera::display()
 		glColor4f( 1.0, 0.0, 0.0, 1.0 );
 		glRasterPos2i( 10, m_height-23 );
 
-		for ( unsigned int i = 0; i < text.str().length(); i++ )
-			glutBitmapCharacter( GLUT_BITMAP_8_BY_13, text.str()[i] );
+		drawString( text.str() );
+//		for ( unsigned int i = 0; i < text.str().length(); i++ )
+//			glutBitmapCharacter( GLUT_BITMAP_8_BY_13, text.str()[i] );
 
 		glPixelZoom( xzoom, yzoom );
 
 		glPopMatrix();
 		glEnable( GL_LIGHTING );
 	}
-	**/
 
 	// wait for the screen refresh
 	m_vsync.wait( m_doSync );

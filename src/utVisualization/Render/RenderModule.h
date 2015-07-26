@@ -230,6 +230,8 @@ class VirtualObjectKey
 };
 
 
+struct VirtualCameraPrivate;
+
 /**
  * @ingroup driver_components
  * Module for virtual OpenGL camera.
@@ -250,7 +252,13 @@ public:
 	/** Destructor */
 	~VirtualCamera();
 
-	/** GLUT keyboard callback */
+	/** start the rendering module **/
+	virtual void startModule();
+
+	/** stop the rendering module **/
+	virtual void stopModule();
+
+	/** keyboard callback */
 	void keyboard( unsigned char key, int x, int y );
 
 	/** button output helper function */
@@ -259,10 +267,10 @@ public:
 	/** button output helper function */
 	Math::Vector< double, 2 > getLastMousePos();
 
-	/** GLUT reshape callback */
+	/** reshape callback */
 	void reshape( int w, int h );
 
-	/** GLUT display callback */
+	/** display callback */
 	void display();
 
 	/** callback from the VirtualObjects if world has changed */
@@ -304,6 +312,9 @@ protected:
 	VideoSync m_vsync;
 	
 	StereoRenderPasses m_stereoRenderPasses;
+
+	static int m_window;
+	VirtualCameraPrivate* m_camera_private;
 
 };
 

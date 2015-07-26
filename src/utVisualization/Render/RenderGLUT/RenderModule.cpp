@@ -29,6 +29,11 @@
 
 #include "GL/freeglut.h"
 
+#ifdef __APPLE__
+	#include <OpenGL/OpenGL.h>
+	#include <GLUT/glut.h>
+#endif
+
 #include "RenderModule.h"
 
 log4cpp::Category& logger( log4cpp::Category::getInstance( "Drivers.Render" ) );
@@ -101,7 +106,8 @@ int g_run = 1;
 int   g_argc   = 1;
 char* g_argv[] = { "VirtualCamera", 0 };
 
-
+struct VirtualCameraPrivate {};
+int VirtualCamera::m_window_count = 0;
 
 void g_mainloop()
 {
@@ -242,6 +248,11 @@ void g_reshape( int w, int h )
 }
 
 
+void VirtualCamera::startModule() {
+}
+
+void VirtualCamera::stopModule() {
+}
 
 int VirtualCamera::setup()
 {
@@ -420,6 +431,7 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	, m_lastRedrawTime(0)
 	, m_vsync()
 	, m_stereoRenderPasses( stereoRenderNone )
+	, m_camera_private( NULL )
 {
 	LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating module for module key '" << m_moduleKey << "'...");
 
