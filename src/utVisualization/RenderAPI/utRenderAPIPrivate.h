@@ -6,23 +6,20 @@
 #define UBITACK_UTRENDERAPIPRIVATE_H
 
 #include "utRenderAPI.h"
-
-
-
-
-class CameraHandlePrivate {
-public:
-    CameraHandlePrivate();
-    ~CameraHandlePrivate();
-
-private:
-    void* m_pModuleHandle;
-};
-
+#include <boost/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 namespace Ubitrack {
     namespace Visualization {
-        registerVirtualCamera(CameraHandlePrivate* camera);
+
+        RenderManager *g_render_manager = NULL;
+
+        unsigned int registerVirtualCamera(std::string& name, CameraHandlePrivate* camera) {
+            if (g_render_manager != NULL) {
+                CameraHandle* cam = new CameraHandle(name, camera);
+                unsigned int cam_id = g_render_manager->register_camera(cam);
+            }
+        }
     };
 };
 

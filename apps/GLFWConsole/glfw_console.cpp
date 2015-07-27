@@ -25,11 +25,14 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <iostream>
+#include <vector>
 #ifdef _WIN32
 #include <conio.h>
 #endif
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 #include <utFacade/AdvancedFacade.h>
 #include <utUtil/Exception.h>
@@ -37,7 +40,7 @@
 #include <utUtil/OS.h>
 
 #include "glfw_rendermanager.h"
-
+#include "utVisualization/RenderAPI/utRenderAPI.h"
 
 
 using namespace Ubitrack;
@@ -46,6 +49,7 @@ using namespace Ubitrack::Visualization;
 bool bStop = false;
 
 RenderAPI::RenderManager* pRenderManager = NULL;
+boost::condition g_continue;
 
 void ctrlC ( int i )
 {
@@ -182,16 +186,52 @@ int main( int ac, char** av )
 		// setup rendermanager
 		pRenderManager->setup();
 
-		while( !bStop && !pRenderManager->all_windows_closed() )
+		while( !bStop && pRenderManager->any_windows_valid() )
 		{
-			Util::sleep( 1000 );
-			#ifdef _WIN32
-			if(kbhit())
-			{
-				char c = getch();		
-				if(c == 'q') bStop = true;
+			CameraHandle* cam;
+			GLFWWindowImpl* win;
+			if (pRenderManager->need_setup()) {
+				cam = pRenderManager->setup_pop_front();
+				win = new GLFWWindowImpl(cam->initial_width(),
+														 cam->initial_height(),
+														 cam->title());
+				if (!cam->setup(win)) {
+					pRenderManager->setup_push_back(cam);
+				}
 			}
-			#endif
+
+			std::vector< unsigned int > chToDelete;
+			CameraHandleMap::iterator pos = pRenderManager->cameras_begin();
+			CameraHandleMap::iterator end = pRenderManager->cameras_end();
+			while ( pos != end ) {
+				bool is_valid = false;
+				if (pos->second) {
+					cam = pos->second;
+					if (cam->get_window()) {
+						win = cam->get_window();
+						if (win->is_valid()) {
+							cam->pre_render();
+							cam->redraw();
+							// post_render ??
+							is_valid = true;
+						}
+					}
+				}
+				pos++;
+				if (!is_valid) {
+					chToDelete.push_back(pos->first);
+				}
+			}
+
+			if (chToDelete.size() > 0) {
+				for (unsigned int i = 0; i < chToDelete.size(); i++) {
+					unsigned int cam_id = chToDelete.at(i);
+					pRenderManager->get_camera(cam_id)->teardown();
+					pRenderManager->unregister_camera(cam_id);
+				}
+			}
+
+			g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
 		}
 
 		// teardown rendermanager

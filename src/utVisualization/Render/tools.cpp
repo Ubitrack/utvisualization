@@ -124,6 +124,7 @@ void drawTexturedBox( GLdouble x, GLdouble y, GLdouble z ) {
 
 void drawWireCone(GLdouble base, GLdouble height, GLint slices, GLint stacks) {
 //	glutWireCone( base, height, slices, stacks);
+	std::cout << "tools.cpp GLUT FUNCTION DISABLED glutWireCone( base, height, slices, stacks)" << std::endl;
 }
 
 
@@ -133,6 +134,7 @@ void drawString( std::string text ) {
 	//glEnable( GL_LINE_SMOOTH );
 	for ( const char* tmp = text.c_str(); *tmp; tmp++ ) {
 //		glutStrokeCharacter( GLUT_STROKE_ROMAN, *tmp );
+		std::cout << "tools.cpp GLUT FUNCTION DISABLED glutStrokeCharacter( GLUT_STROKE_ROMAN, '" << *tmp << "' )" << std::endl;
 	}
 }
 

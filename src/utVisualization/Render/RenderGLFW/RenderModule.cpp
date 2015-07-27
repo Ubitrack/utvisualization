@@ -76,15 +76,28 @@ log4cpp::Category& loggerEvents( log4cpp::Category::getInstance( "Ubitrack.Event
 #include <iomanip>
 #include <math.h>
 
+#include "utVisualization/RenderAPI/RenderAPI.h"
+
 
 namespace Ubitrack { namespace Drivers {
 
 using namespace Dataflow;
+using namespace Visualization;
+
+class VirtualCameraHandle : public CameraHandle {
+
+
+};
+
+
 
 struct VirtualCameraPrivate
 {
 	bool m_initialized;
 };
+
+
+
 
 struct WindowHelper
 {

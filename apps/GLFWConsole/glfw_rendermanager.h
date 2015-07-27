@@ -34,8 +34,10 @@ namespace Ubitrack {
 
 
             // Implementation of Public interface
-            virtual void create();
+            virtual bool is_valid();
+            virtual bool create();
             virtual void initGL();
+            virtual void destroy();
 
 
         private:
