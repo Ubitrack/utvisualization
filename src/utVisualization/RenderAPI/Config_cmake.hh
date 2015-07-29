@@ -2,7 +2,22 @@
 #define __UBITRACK_VISUALIZATION_CONFIG_H_INCLUDED__
 #define UBITRACK_COMPONENTS_PATH "${UBITRACK_COMPONENT_INSTALL_PATH}"
 #define UBITRACK_COMPONENTS_RELAVIVEPATH "${UBITRACK_COMPONENT_INSTALL_DIRECTORY}"
-#ifndef HAVE_GLEW 
+
+#ifdef _WIN32
+// fix for simplified build scripts (ulrich eck)
+#   ifdef UTRENDERAPI_DLL
+#       define UBITRACK_DLL
+#   endif
+#	ifdef UBITRACK_DLL
+#		define UBITRACK_EXPORT __declspec( dllexport )
+#	else
+#		define UBITRACK_EXPORT __declspec( dllimport )
+#	endif
+#else // _WIN32
+#	define UBITRACK_EXPORT
+#endif
+
+#ifndef HAVE_GLEW
 #cmakedefine HAVE_GLEW
 #endif
 #ifndef HAVE_FREEGLUT 

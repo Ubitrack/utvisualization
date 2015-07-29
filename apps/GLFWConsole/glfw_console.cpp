@@ -29,6 +29,28 @@
 #ifdef _WIN32
 #include <conio.h>
 #endif
+
+
+#ifdef HAVE_GLEW
+	#include "GL/glew.h"
+#endif
+
+#include <GLFW/glfw3.h>
+
+#ifdef _WIN32
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+	#include <utUtil/CleanWindows.h>
+#elif __APPLE__
+    #include <OpenGL/gl3.h>
+    #include <OpenGL/glu.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+	#include <GL/glx.h>
+#endif
+
+
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -48,14 +70,20 @@ using namespace Ubitrack::Visualization;
 
 bool bStop = false;
 
-RenderAPI::RenderManager* pRenderManager = NULL;
-boost::condition g_continue;
-
 void ctrlC ( int i )
 {
 	bStop = true;
 }
 
+void CheckForGLErrors(std::string a_szMessage)
+{
+    GLenum error = glGetError();
+    while (error != GL_NO_ERROR)
+    {
+        std::cout << "Error: " << a_szMessage.c_str() << ", ErrorID: " << error << ": " << gluErrorString(error);
+        error = glGetError(); // get next error if any.
+    }
+}
 
 int main( int ac, char** av )
 {
@@ -65,7 +93,6 @@ int main( int ac, char** av )
 	{
 		// initialize logging		
 		Util::initLogging();
-		
 
 		// program options
 		std::string sServerAddress;
@@ -155,8 +182,7 @@ int main( int ac, char** av )
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 		// create and register render manager
-		pRenderManager = new RenderManager();
-		setDefaultRenderManager(pRenderManager);
+		RenderManager& pRenderManager = RenderManager::singleton();
 
 
 		// configure ubitrack
@@ -184,58 +210,64 @@ int main( int ac, char** av )
 		utFacade.startDataflow();
 
 		// setup rendermanager
-		pRenderManager->setup();
+		pRenderManager.setup();
 
-		while( !bStop && pRenderManager->any_windows_valid() )
+		while( !bStop && pRenderManager.any_windows_valid() )
 		{
 			CameraHandle* cam;
 			GLFWWindowImpl* win;
-			if (pRenderManager->need_setup()) {
-				cam = pRenderManager->setup_pop_front();
+			if (pRenderManager.need_setup()) {
+				cam = pRenderManager.setup_pop_front();
 				win = new GLFWWindowImpl(cam->initial_width(),
 														 cam->initial_height(),
 														 cam->title());
 				if (!cam->setup(win)) {
-					pRenderManager->setup_push_back(cam);
+					pRenderManager.setup_push_back(cam);
 				}
+                glfwPollEvents();
 			}
 
 			std::vector< unsigned int > chToDelete;
-			CameraHandleMap::iterator pos = pRenderManager->cameras_begin();
-			CameraHandleMap::iterator end = pRenderManager->cameras_end();
+			CameraHandleMap::iterator pos = pRenderManager.cameras_begin();
+			CameraHandleMap::iterator end = pRenderManager.cameras_end();
 			while ( pos != end ) {
 				bool is_valid = false;
 				if (pos->second) {
 					cam = pos->second;
 					if (cam->get_window()) {
-						win = cam->get_window();
+						win = static_cast<GLFWWindowImpl*>(cam->get_window());
 						if (win->is_valid()) {
-							cam->pre_render();
-							cam->redraw();
-							// post_render ??
+                            win->pre_render();
+//							cam->pre_render();
+							cam->render();
+							//cam->post_render(); ??
 							is_valid = true;
-						}
+                            win->post_render();  // make this loop through all current windows??
+                            CheckForGLErrors("Render Error");						}
 					}
 				}
 				pos++;
 				if (!is_valid) {
 					chToDelete.push_back(pos->first);
 				}
+                glfwPollEvents();
 			}
 
 			if (chToDelete.size() > 0) {
 				for (unsigned int i = 0; i < chToDelete.size(); i++) {
 					unsigned int cam_id = chToDelete.at(i);
-					pRenderManager->get_camera(cam_id)->teardown();
-					pRenderManager->unregister_camera(cam_id);
+					pRenderManager.get_camera(cam_id)->teardown();
+					pRenderManager.unregister_camera(cam_id);
+                    glfwPollEvents();
 				}
 			}
 
-			g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
+			// is this really needed ?
+//			g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
 		}
 
 		// teardown rendermanager
-		pRenderManager->teardown();
+		pRenderManager.teardown();
 
 		std::cout << "Stopping dataflow..." << std::endl << std::flush;
 		utFacade.stopDataflow();

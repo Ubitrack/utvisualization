@@ -9,21 +9,10 @@
 using namespace Ubitrack;
 using namespace Ubitrack::Visualization;
 
+// the singleton render manager object
+static boost::scoped_ptr< RenderManager > g_pRenderManager;
+static int g_RefRenderManager = 0;
 
-
-
-
-// some unavoidable globals to connect the dataflow components to the rendermanager
-std::deque<CameraHandle *> g_setup;
-std::map<std::string, int> g_names;
-std::map<int, CameraHandle *> g_modules;
-std::map<int, VirtualWindow> g_windows;
-std::map<VirtualWindow *, int> g_windows_rev;
-
-boost::mutex g_globalMutex;
-boost::condition g_setup_performed;
-boost::condition g_continue;
-boost::condition g_cleanup_done;
 
 
 VirtualWindow::VirtualWindow(int _width, int _height, const std::string &_title)
@@ -54,19 +43,19 @@ void VirtualWindow::reshape(int w, int h) {
 
 }
 
-CameraHandle::CameraHandle(std::string &_name, int _width, int _height, CameraHandlePrivate *_handle)
+CameraHandle::CameraHandle(std::string &_name, int _width, int _height, Drivers::VirtualCamera *_handle)
         : m_sWindowName(_name)
         , m_initial_width(_width)
         , m_initial_height(_height)
         , m_bSetupNeeded(true)
         , m_pVirtualWindow(NULL)
-        , m_pCameraHandlePrivate(_handle)
+        , m_pVirtualCamera(_handle)
 {
 
 }
 
 CameraHandle::~CameraHandle() {
-// delete m_pCameraHandlePrivate ?
+// delete m_pVirtualCamera ?
 }
 
 bool CameraHandle::need_setup() {
@@ -94,17 +83,56 @@ void CameraHandle::teardown() {
     }
 }
 
-void CameraHandle::activate() {
-    // e.g. activate opengl context for window ..
+void CameraHandle::render() {
+    // extend in subclass
 }
 
-void CameraHandle::redraw() {
-    // extend in subclass
+
+
+void CameraHandle::on_window_size(int w, int h) {
+
+}
+
+void CameraHandle::on_window_close() {
+
+}
+
+void CameraHandle::on_keypress(int key, int scancode, int action, int mods) {
+
+}
+
+
+void CameraHandle::on_render() {
+
+}
+
+void CameraHandle::on_cursorpos(double xpos, double ypos) {
+
+}
+
+void CameraHandle::post_redraw() {
+    // maybe needed
 }
 
 void CameraHandle::keyboard(unsigned char key, int x, int y) {
     // extend in subclass
 }
+
+
+
+RenderManager& RenderManager::singleton()
+{
+    // race condition between network receiving thread and main thread
+    static boost::mutex singletonMutex;
+    boost::mutex::scoped_lock l( singletonMutex );
+
+    // create a new singleton if necessary
+    if ( !g_pRenderManager )
+        g_pRenderManager.reset( new RenderManager() );
+
+    return *g_pRenderManager;
+}
+
 
 
 RenderManager::RenderManager()
@@ -155,11 +183,11 @@ void RenderManager::teardown() {
 }
 
 CameraHandleMap::iterator RenderManager::cameras_begin() {
-    m_mRegisteredCameras.begin();
+    return m_mRegisteredCameras.begin();
 }
 
 CameraHandleMap::iterator RenderManager::cameras_end() {
-    m_mRegisteredCameras.end();
+    return m_mRegisteredCameras.end();
 }
 
 bool RenderManager::wait_for_event() {
@@ -194,12 +222,3 @@ CameraHandle *RenderManager::get_camera(unsigned int cam_id) {
     }
     return NULL;
 }
-
-void setDefaultRenderManager(RenderManager *mgr) {
-    if (g_render_manager != NULL) {
-        delete g_render_manager;
-    }
-    g_render_manager = mgr;
-}
-
-

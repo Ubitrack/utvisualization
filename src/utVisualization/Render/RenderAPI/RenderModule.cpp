@@ -76,7 +76,7 @@ log4cpp::Category& loggerEvents( log4cpp::Category::getInstance( "Ubitrack.Event
 #include <iomanip>
 #include <math.h>
 
-#include "utVisualization/RenderAPI/RenderAPI.h"
+#include "utVisualization/RenderAPI/utRenderAPIPrivate.h"
 
 
 namespace Ubitrack { namespace Drivers {
@@ -84,258 +84,10 @@ namespace Ubitrack { namespace Drivers {
 using namespace Dataflow;
 using namespace Visualization;
 
-class VirtualCameraHandle : public CameraHandle {
-
-
-};
-
-
-
-struct VirtualCameraPrivate
-{
-	bool m_initialized;
-};
-
-
-
-
-struct WindowHelper
-{
-	GLFWwindow*	m_pWindow;
-//	GLEWContext*	m_pGLEWContext;
-};
-typedef WindowHelper* 	WindowHandle;
-
-int VirtualCamera::m_window_count = 0;
-
-// some unavoidable globals to manage the GLUT main loop and its handlers
-std::deque< VirtualCamera* > g_setup;
-std::map< std::string, int > g_names;
-std::map< int, VirtualCamera* > g_modules;
-std::map< int, WindowHandle > g_windows;
-std::map< GLFWwindow*, int > g_windows_rev;
-std::set< VirtualObject* > g_cleanup_components;
-boost::scoped_ptr< boost::thread > g_glfwThread;
-boost::mutex g_globalMutex;
-boost::condition g_setup_performed;
-boost::condition g_continue;
-boost::condition g_cleanup_done;
-
-//GLEWContext* glewGetContext();   // This needs to be defined for GLEW MX to work, along with the GLEW_MX define in the perprocessor!
-//void MakeContextCurrent(WindowHandle a_hWindowHandle);
-bool ShouldClose();
-void CheckForGLErrors(std::string a_szMessage);
-void g_error(int a_iError, const char* a_szDiscription);
-
-void g_mainloop()
-{
-	LOG4CPP_DEBUG( logger, "g_mainloop(): Render thread started" );
-	glfwSetErrorCallback(g_error);
-
-	boost::mutex::scoped_lock lock( g_globalMutex );
-
-
-//		glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-
-
-	bool  initialized = false;
-	while (!initialized || !ShouldClose())
-	{
-		// are there any setup functions pending?
-		if ( g_setup.size() > 0 ) {
-			LOG4CPP_DEBUG( logger, "g_mainloop(): Calling setup()..." );
-
-			// try to setup the first window in the queue
-			VirtualCamera* tmp = g_setup.front(); 
-			g_setup.pop_front();
-			// if this failed, push it to the end of the queue
-			if ( !(tmp->setup()) ) {
-				g_setup.push_back( tmp );
-				LOG4CPP_DEBUG( logger, "g_mainloop(): setup() failed, scheduling component to be set up again..." );
-			}
-			else {
-				LOG4CPP_DEBUG( logger, "g_mainloop(): setup() successful" );
-			}
-			
-
-			// let GLUT do its thing..
-			glfwPollEvents();
-//			glutMainLoopEvent();
-			if ( g_setup.size() == 0 )
-			{
-				LOG4CPP_DEBUG( logger, "g_mainloop(): setup() all setup() activities performed" );
-				g_setup_performed.notify_all();
-				initialized = true;
-			}
-		}
-
-		// are there any component cleanup functions pending?
-		if ( ! g_cleanup_components.empty() ) 
-		{
-			LOG4CPP_DEBUG( logger, "g_mainloop(): Cleaning up GL context of all pending components..." );
-			while ( ! g_cleanup_components.empty() )
-			{
-				VirtualObject * voPtr = *(g_cleanup_components.begin());
-				voPtr->glCleanup();
-				g_cleanup_components.erase( voPtr );
-
-				// let GLUT do its thing..
-				glfwPollEvents();
-//				glutMainLoopEvent();
-			}
-			g_cleanup_done.notify_all();
-			LOG4CPP_DEBUG( logger, "g_mainloop(): Cleaning done" );
-		}
-		
-		// check
-		// - if a redraw is needed for any window
-		// - if any windows have been deleted
-
-		std::map< int,VirtualCamera* >::iterator pos = g_modules.begin();
-		std::map< int,VirtualCamera* >::iterator end = g_modules.end();
-
-		while ( pos != end ) {
-			LOG4CPP_TRACE(logger, "g_mainloop(): iterating module with key '" << pos->first << "'...");
-
-			if (pos->second) {
-
-				if (g_windows.find( pos->first ) != g_windows.end()) {
-					LOG4CPP_TRACE(logger, "g_mainloop(): Call redraw()");
-
-					pos->second->redraw();
-
-					// put current buffer into display
-					LOG4CPP_TRACE( logger, "display(): Swapping buffers.." );
-					glfwSwapBuffers(g_windows[pos->first]->m_pWindow);  // make this loop through all current windows??
-					CheckForGLErrors("Render Error");
-				} else {
-					// camera without window ..
-				}
-
-				pos++;
-			}
-			else {
-				LOG4CPP_DEBUG(logger, "g_mainloop(): Destroying GL window with handle " << pos->first << "...");
-
-				if (g_windows.find(pos->first) != g_windows.end()) {
-					if (g_windows_rev.find(g_windows[pos->first]->m_pWindow) != g_windows_rev.end()) {
-						g_windows_rev.erase(g_windows[pos->first]->m_pWindow);
-					}
-
-					glfwDestroyWindow(g_windows[pos->first]->m_pWindow);
-
-					g_windows.erase(pos->first);
-					g_modules.erase(pos++);
-
-					// let GLUT do its thing..
-					glfwPollEvents();
-
-					LOG4CPP_DEBUG(logger,
-								  "g_mainloop(): GL window destroyed, " << g_modules.size() << " modules remaining");
-
-					// quit thread when last module is destroyed
-					if (g_modules.empty()) {
-						glfwPollEvents();
-						LOG4CPP_DEBUG(logger, "g_mainloop(): Render thread stopped");
-						return;
-					}
-				}
-			}
-		}
-
-		// Be nice to the rest of the system. g_glutThread->yield() doesn't have any noticeable effect
-		// with timeslices of the size that is common today. 5 ms maxes the frame rate at 200 Hz, but 
-		// that should be sufficient for most kinds of hardware.
-		// FIXME: probably needs to be increased to at least 60 Hz again for frame-sequential stereo
-		// Can this only be done when stereo is actually used? Otherwise this will be a waste of processing time.(DP)
-		g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
-		
-		LOG4CPP_TRACE( logger, "g_mainloop(): timed_wait finished" );
-	}
-}
-
-
-
-void g_keyboard( GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (g_windows_rev.find( window ) == g_windows_rev.end())
-		return;
-
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-
-	VirtualCamera* win = g_modules[ g_windows_rev[window] ];
-	if ( win ) win->keyboard( key, xpos, ypos );
-}
-
-
-void g_reshape( GLFWwindow* window, int w, int h )
-{
-	if (g_windows_rev.find( window ) == g_windows_rev.end())
-		return;
-
-	VirtualCamera* win = g_modules[ g_windows_rev[window] ];
-	if ( win ) win->reshape( w, h );
-}
-
-
-void g_error(int a_iError, const char* a_szDiscription)
-{
-	LOG4CPP_ERROR( logger, "GLFW Error occured, Error ID: " << a_iError << ", Description: " << a_szDiscription);
-}
-
-void VirtualCamera::startModule() {
-}
-
-void VirtualCamera::stopModule() {
-}
-
 int VirtualCamera::setup()
 {
     LOG4CPP_DEBUG( logger, "setup(): Starting setup of window for module key " << m_moduleKey );
 
-	// enable stencil buffer?
-//	if ( m_moduleKey.m_bEnableStencil )
-//		glutInitDisplayMode( GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE | GLUT_STENCIL );
-	
-//	if ( !m_moduleKey.m_sGameMode.empty() )
-//	{
-//		glutGameModeString( m_moduleKey.m_sGameMode.c_str() );
-//		m_winHandle = glutEnterGameMode();
-//	}
-//	else if ( m_moduleKey.substr(0,3) == "Sub" )
-//	{
-//		// sub-window -> check if the parent has already been created
-//		std::string parent = m_moduleKey.substr(3);
-//		if (g_names.find( parent ) == g_names.end()) return 0;
-//		// parent is there, so create the subwindow
-//		m_winHandle = glutCreateSubWindow( g_names[parent], 0, 0, m_width, m_height );
-//	}
-//	else
-//	{
-//		// create new top level window,
-//		glutInitWindowSize( m_width, m_height );
-//		m_winHandle = glutCreateWindow( m_moduleKey.c_str() );
-//	}
-
-//	// create new window data:
-//	WindowHandle newWindow = new WindowHelper();
-//	if (newWindow == NULL)
-//		return 0;
-//
-//	newWindow->m_pWindow = NULL;
-//
-//	GLFWmonitor* pMonitor = NULL;
-//
-////	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, a_hShare->m_pWindow);  // Window handle is valid, Share its GL Context Data!
-//	newWindow->m_pWindow = glfwCreateWindow(m_width, m_height, m_moduleKey.c_str(), pMonitor, NULL); // Window handle is invalid, do not share!
-//
-//	if (newWindow->m_pWindow == NULL)
-//	{
-//		LOG4CPP_ERROR( logger, "Error: Could not Create GLFW Window!");
-//		delete newWindow;
-//		return 0;
-//	}
 
 
 /** FULLSCREEN NOT MIGRATED .
@@ -353,74 +105,9 @@ int VirtualCamera::setup()
 
 **/
 
-
-	// GLEW provides access to OpenGL extensions
-//#ifdef HAVE_GLEW
-//	// Init GLEW for this context:
-//	GLenum err = glewInit();
-//	if (err != GLEW_OK)
-//	{
-//		// a problem occured when trying to init glew, report it:
-//		LOG4CPP_ERROR( logger, "GLEW Error occured, Description: " <<  glewGetErrorString(err));
-//		glfwDestroyWindow(newWindow->m_pWindow);
-//		delete newWindow;
-//		return 0;
-//	}
-//#endif
-
-
-	// hack for now give every window the next free id.
-	m_winHandle = g_modules.size();
-
     LOG4CPP_DEBUG( logger, "setup(): Window handle is " << m_winHandle );
 
-	// store this-pointer and window handle
-	g_modules[ m_winHandle ] = this;
-	g_windows[ m_winHandle ] = newWindow;
-	g_windows_rev[ newWindow->m_pWindow ] = m_winHandle;
-	g_names[ m_moduleKey ] = m_winHandle;
-	
-	LOG4CPP_DEBUG( logger, "setup(): module '" << this->m_moduleKey << "' with key '" << m_winHandle << "' added to list" );
-
-	// GL: enable and set colors
-	glEnable( GL_COLOR_MATERIAL );
-	glClearColor( 0.0, 0.0, 0.0, 1.0 ); // TODO: make this configurable (but black is best for optical see-through ar!)
-
-	// GL: enable and set depth parameters
-	glEnable( GL_DEPTH_TEST );
-	glClearDepth( 1.0 );
-
-	// GL: disable backface culling
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	glDisable( GL_CULL_FACE );
-
-	// GL: light parameters
-	GLfloat light_pos[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-	GLfloat light_amb[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	GLfloat light_dif[] = { 0.9f, 0.9f, 0.9f, 1.0f };
-
-	// GL: enable lighting
-	glLightfv( GL_LIGHT0, GL_POSITION, light_pos );
-	glLightfv( GL_LIGHT0, GL_AMBIENT,  light_amb );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE,  light_dif );
-	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
-
-	// GL: bitmap handling
-	glPixelStorei( GL_PACK_ALIGNMENT,   1 );
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
-	// GL: alpha blending
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glEnable( GL_BLEND );
-
-	// GL: misc stuff
-	glShadeModel( GL_SMOOTH );
-	glEnable( GL_NORMALIZE );
-
-	// setup callbacks:
-	glfwSetWindowSizeCallback(newWindow->m_pWindow, g_reshape);
-	glfwSetKeyCallback(newWindow->m_pWindow, g_keyboard);
+//	LOG4CPP_DEBUG( logger, "setup(): module '" << this->m_moduleKey << "' with key '" << m_winHandle << "' added to list" );
 
 	ComponentList objects = getAllComponents();
 	for ( ComponentList::iterator i = objects.begin(); i != objects.end(); i++ )
@@ -443,34 +130,15 @@ void VirtualCamera::invalidate( VirtualObject* caller )
 	}
 	m_redraw = 1;
 	LOG4CPP_DEBUG( logger, "invalidate(): Waking up main thread" );
-	g_continue.notify_all();
+//	g_continue.notify_all();
 }
 
 
 /** Cleans up the specified component, blocks until the job has been completed on the GL task */
 void VirtualCamera::cleanup( VirtualObject* vo )
 {
-	LOG4CPP_DEBUG( logger, "cleanup(): Lock mutex" );
 
-	// Scoped lock
-	boost::mutex::scoped_lock l( g_globalMutex );
-
-	// Enqueue component for cleanup of GL context
-	g_cleanup_components.insert( vo );
-
-	LOG4CPP_DEBUG( logger, "cleanup(): Waking up GL thread" );
-
-	// Wake up GL thread and wait until cleanup is done
-	g_continue.notify_all();
-	while ( g_cleanup_components.find( vo ) != g_cleanup_components.end() )
-	{
-		LOG4CPP_DEBUG( logger, "cleanup(): Block until GL context of component has been cleaned up" );
-
-		// This will unlock the lock until wait returns so that the GL task my acquire the lock...
-		g_cleanup_done.timed_wait ( l, boost::posix_time::milliseconds (25) );
-
-		LOG4CPP_TRACE( logger, "cleanup(): Next trial, yet unprocessed components: " << g_cleanup_components.size() );
-	}
+	// need to think about cleanup ..
 
 	LOG4CPP_DEBUG( logger, "cleanup(): Cleanup of component's GL context done" );
 }
@@ -482,7 +150,7 @@ void VirtualCamera::redraw( )
 	// TODO: make minmum fps configureable (currently 2fps)
 	if ((!m_redraw) && (m_stereoRenderPasses == stereoRenderNone && m_lastRedrawTime + 500000000L < Measurement::now()  )) return; 
 //	glutSetWindow( m_winHandle );
-//	LOG4CPP_TRACE( logger, "redraw(): calling glutPostRedisplay" );
+//	LOG4CPP_TRACE( logger, "render(): calling glutPostRedisplay" );
 //	glutPostRedisplay();
 	m_redraw = 0;
 	// directly call display here for GLFW.
@@ -510,73 +178,21 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	, m_camera_private( NULL )
 {
 	LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating module for module key '" << m_moduleKey << "'...");
+	std::string window_name(m_moduleKey.c_str());
 
-	// lock access to globals
-	boost::mutex::scoped_lock l( g_globalMutex );
-
-	LOG4CPP_DEBUG( logger, "VirtualCamera(): Access to virtual camera map acquired");
-
-	// schedule the setup function for this window
-	g_setup.push_back( this );
-
-	// if there's no thread yet, init GLUT library first and create a new control thread
-	// Note: this thread must do ALL OpenGL operations for all VirtualCameras!
-	// Most GL implementation do not look kindly on context sharing between threads!
-	if ( g_glfwThread.get() == 0 ) {
-		LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating single GL thread...");
-
-
-		g_glfwThread.reset( new boost::thread( boost::bind( g_mainloop ) ) );
-
-		LOG4CPP_DEBUG( logger, "VirtualCamera(): Single GL thread created");
-	}
+	CameraHandle* cam = new CameraHandle(window_name, m_width, m_height, this);
+	m_winHandle = RenderManager::singleton().register_camera(cam);
 }
 
 
 VirtualCamera::~VirtualCamera()
 {
-	bool bKillThread = false;
 
 	LOG4CPP_DEBUG( logger, "~VirtualCamera(): Destroying module for module key '" << m_moduleKey << "'...");
-	
-	{
-		// lock access to globals and remove the stored this-pointer
-		boost::mutex::scoped_lock lock( g_globalMutex );
-		
-		LOG4CPP_DEBUG( logger, "~VirtualCamera(): Access to virtual camera map acquired, destroying window with handle '" << m_winHandle << "'");
-		
-		/* 
-		 * Ensure that all pending setup() activities are executed first. This is necessary for example during component 
-		 * creation when all constructors are called sequentially and some component throws an exception so that the data flow
-		 * management instance stops calling constructors and starts calling destructors.
-		 */
-		while ( ! g_setup.empty() ) 
-		{
-			LOG4CPP_DEBUG( logger, "~VirtualCamera(): waiting for scheduled setup() activities to terminate" );
-			
-			g_setup_performed.timed_wait( lock, boost::posix_time::milliseconds(100) );
-		}
-		
-		g_modules[ m_winHandle ] = 0;
-		g_names.erase( m_moduleKey );
 
-		// kill thread if this was the last window
-		if ( g_names.empty() ) {
-			bKillThread = true;
-		}
-	}
-
-	// the thread should die with the last render window
-	if ( bKillThread )
-	{
-		LOG4CPP_DEBUG( logger, "~VirtualCamera(): Waiting for render thread to stop..." );
-
-		g_glfwThread->join();
-		boost::mutex::scoped_lock l( g_globalMutex );
-		g_glfwThread.reset();
-
-		LOG4CPP_DEBUG( logger, "~VirtualCamera(): Render thread stopped" );
-	}
+	// need to remove ourselves from the render-manager
+	RenderManager::singleton().unregister_camera(m_winHandle);
+	// more cleanup needed ?
 
 	LOG4CPP_DEBUG( logger, "~VirtualCamera(): module destroyed" );
 }
@@ -663,12 +279,12 @@ void VirtualCamera::display()
 	glLoadIdentity();
 
 	// calculate fps
-	int curtime = (int)(glfwGetTime() * 1000.);
-	if ((curtime - m_lasttime) >= 1000) {
-		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
-		m_lasttime  = curtime;
-		m_lastframe = curframe;
-	}
+//	int curtime = (int)(glfwGetTime() * 1000.);
+//	if ((curtime - m_lasttime) >= 1000) {
+//		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
+//		m_lasttime  = curtime;
+//		m_lastframe = curframe;
+//	}
 
 	LOG4CPP_TRACE( logger, "display(): Redrawing.." );
 
@@ -743,7 +359,9 @@ void VirtualCamera::display()
 	}
 
 	// wait for the screen refresh
-	m_vsync.wait( m_doSync );
+
+	// XXX commented out for now .. maybe needs extra api
+	//m_vsync.wait( m_doSync );
 }
 
 
@@ -829,52 +447,6 @@ boost::shared_ptr< VirtualObject > VirtualCamera::createComponent( const std::st
     LOG4CPP_DEBUG( logger, "createComponent(): done");
 }
 
-
-bool ShouldClose()
-{
-	if (g_windows.empty())
-		return true;
-
-	std::map<int,WindowHandle> lToDelete;
-	std::map<int,WindowHandle>::iterator pos;
-
-	for(pos = g_windows.begin(); pos != g_windows.end(); ++pos)
-	{
-		if (glfwWindowShouldClose(pos->second->m_pWindow))
-		{
-			lToDelete[pos->first] = pos->second;
-		}
-	}
-
-	if (!lToDelete.empty())
-	{
-		// we have windows to delete, Delete them:
-		for(pos = lToDelete.begin(); pos != lToDelete.end(); ++pos)
-		{
-			glfwDestroyWindow(pos->second->m_pWindow);
-
-			delete pos->second;
-
-			g_windows.erase(pos->first);
-		}
-	}
-
-	if (g_windows.empty())
-		return true;
-
-	return false;
-}
-
-
-void CheckForGLErrors(std::string a_szMessage)
-{
-	GLenum error = glGetError();
-	while (error != GL_NO_ERROR)
-	{
-		LOG4CPP_ERROR( logger, "Error: " << a_szMessage.c_str() << ", ErrorID: " << error << ": " << gluErrorString(error) );
-		error = glGetError(); // get next error if any.
-	}
-}
 
 /** register module at factory */
 UBITRACK_REGISTER_COMPONENT( ComponentFactory* const cf )

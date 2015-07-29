@@ -12,6 +12,10 @@ GLFWWindowImpl::GLFWWindowImpl(int _width, int _height, const std::string &_titl
 
 }
 
+GLFWWindowImpl::~GLFWWindowImpl() {
+
+}
+
 bool GLFWWindowImpl::is_valid() {
     // maybe more checks.
     return (m_pWindow != NULL ) && (!glfwWindowShouldClose(m_pWindow));
@@ -23,7 +27,7 @@ bool GLFWWindowImpl::create() {
     return m_pWindow != NULL;
 }
 
-void GLFWWindowImpl::initGL() {
+void GLFWWindowImpl::initGL(CameraHandle* event_handler) {
     // log error ??
     if (m_pWindow == NULL)
         return;
@@ -78,8 +82,16 @@ void GLFWWindowImpl::initGL() {
     glEnable(GL_NORMALIZE);
 
     // setup callbacks:
-    glfwSetWindowSizeCallback(m_pWindow, g_reshape);
-    glfwSetKeyCallback(m_pWindow, g_keyboard);
+    glfwSetWindowUserPointer(m_pWindow, event_handler);
+
+    // which one is the better window-size callback in GLFW ??
+    //glfwSetWindowSizeCallback(m_pWindow, WindowResizeCallback);
+    glfwSetFramebufferSizeCallback(m_pWindow, WindowResizeCallback);
+    glfwSetWindowRefreshCallback(m_pWindow, WindowRefreshCallback);
+    glfwSetWindowCloseCallback(m_pWindow, WindowCloseCallback);
+    glfwSetKeyCallback(m_pWindow, WindowKeyCallback);
+    glfwSetCursorPosCallback(m_pWindow, WindowCursorPosCallback);
+
 }
 
 void GLFWWindowImpl::destroy() {
@@ -87,4 +99,13 @@ void GLFWWindowImpl::destroy() {
         glfwDestroyWindow(m_pWindow);
         m_pWindow = NULL;
     }
+}
+
+
+void GLFWWindowImpl::pre_render() {
+    glfwMakeContextCurrent(m_pWindow);
+}
+
+void GLFWWindowImpl::post_render() {
+    glfwSwapBuffers(m_pWindow);
 }

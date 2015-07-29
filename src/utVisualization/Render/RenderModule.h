@@ -252,12 +252,6 @@ public:
 	/** Destructor */
 	~VirtualCamera();
 
-	/** start the rendering module **/
-	virtual void startModule();
-
-	/** stop the rendering module **/
-	virtual void stopModule();
-
 	/** keyboard callback */
 	void keyboard( unsigned char key, int x, int y );
 
