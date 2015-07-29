@@ -89,7 +89,9 @@ class CameraHandleImpl : public CameraHandle {
 
 public:
 	CameraHandleImpl(std::string& _name, int _width, int _height, VirtualCamera* _handle)
-			: CameraHandle(_name, _width, _height, _handle)
+	: CameraHandle(_name, _width, _height, _handle)
+	, m_last_xpos( 0. )
+	, m_last_ypos( 0. )
 	{
 	}
 
@@ -110,6 +112,26 @@ public:
 			m_pVirtualCamera->display();
 		}
 	}
+
+	virtual void on_keypress(int key, int scancode, int action, int mods) {
+		if (m_pVirtualCamera != NULL) {
+			m_pVirtualCamera->keyboard((unsigned char) key, (int) m_last_xpos, (int) m_last_ypos);
+		}
+	}
+
+	virtual void on_render() {
+		if (m_pVirtualCamera != NULL) {
+			m_pVirtualCamera->display();
+		}
+	}
+
+	virtual void on_cursorpos(double xpos, double ypos) {
+		m_last_xpos = xpos;
+		m_last_ypos = ypos;
+	}
+
+private:
+	double m_last_xpos, m_last_ypos;
 
 };
 

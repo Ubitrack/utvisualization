@@ -225,9 +225,11 @@ int main( int ac, char** av )
 														 cam->title());
 				if (!cam->setup(win)) {
 					pRenderManager.setup_push_back(cam);
+				} else {
+					win->initGL(cam);
+					windows_opened++;
 				}
                 glfwPollEvents();
-				windows_opened++;
 			}
 
 			std::vector< unsigned int > chToDelete;
@@ -265,6 +267,8 @@ int main( int ac, char** av )
 				}
 			}
 
+
+			// XXX limit framerate to when update is needed.
 			// is this really needed ?
 //			g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
 		}
