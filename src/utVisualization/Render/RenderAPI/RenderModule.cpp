@@ -84,6 +84,38 @@ namespace Ubitrack { namespace Drivers {
 using namespace Dataflow;
 using namespace Visualization;
 
+
+class CameraHandleImpl : public CameraHandle {
+
+public:
+	CameraHandleImpl(std::string& _name, int _width, int _height, VirtualCamera* _handle)
+			: CameraHandle(_name, _width, _height, _handle)
+	{
+	}
+
+	~CameraHandleImpl()
+	{
+	}
+
+	virtual bool setup(VirtualWindow* window) {
+		bool ret = CameraHandle::setup(window);
+		if (m_pVirtualCamera != NULL) {
+			m_pVirtualCamera->setup();
+		}
+		return ret;
+	}
+
+	virtual void render() {
+		if (m_pVirtualCamera != NULL) {
+			m_pVirtualCamera->display();
+		}
+	}
+
+};
+
+
+
+
 int VirtualCamera::setup()
 {
     LOG4CPP_DEBUG( logger, "setup(): Starting setup of window for module key " << m_moduleKey );
@@ -180,7 +212,7 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating module for module key '" << m_moduleKey << "'...");
 	std::string window_name(m_moduleKey.c_str());
 
-	CameraHandle* cam = new CameraHandle(window_name, m_width, m_height, this);
+	CameraHandle* cam = new CameraHandleImpl(window_name, m_width, m_height, this);
 	m_winHandle = RenderManager::singleton().register_camera(cam);
 }
 

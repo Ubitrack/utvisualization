@@ -211,13 +211,15 @@ int main( int ac, char** av )
 
 		// setup rendermanager
 		pRenderManager.setup();
+		unsigned int windows_opened = 0;
 
-		while( !bStop && pRenderManager.any_windows_valid() )
+		while( !bStop && (( windows_opened == 0 ) || ( pRenderManager.any_windows_valid() )))
 		{
 			CameraHandle* cam;
 			GLFWWindowImpl* win;
 			if (pRenderManager.need_setup()) {
 				cam = pRenderManager.setup_pop_front();
+				std::cout << "Camera setup: " << cam->title() << std::endl;
 				win = new GLFWWindowImpl(cam->initial_width(),
 														 cam->initial_height(),
 														 cam->title());
@@ -225,6 +227,7 @@ int main( int ac, char** av )
 					pRenderManager.setup_push_back(cam);
 				}
                 glfwPollEvents();
+				windows_opened++;
 			}
 
 			std::vector< unsigned int > chToDelete;

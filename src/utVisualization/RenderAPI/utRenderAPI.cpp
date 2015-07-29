@@ -154,6 +154,7 @@ bool RenderManager::need_setup() {
 
 
 bool RenderManager::any_windows_valid() {
+    boost::mutex::scoped_lock lock( m_mutex );
     bool awv = false;
     for (CameraHandleMap::iterator it=m_mRegisteredCameras.begin(); it != m_mRegisteredCameras.end(); ++it) {
         awv |= it->second->get_window()->is_valid();

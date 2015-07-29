@@ -99,7 +99,6 @@ namespace Ubitrack {
             int m_initial_height;
             VirtualWindow* m_pVirtualWindow;
 
-        private:
             std::string m_sWindowName;
             bool m_bSetupNeeded;
             Drivers::VirtualCamera* m_pVirtualCamera;
