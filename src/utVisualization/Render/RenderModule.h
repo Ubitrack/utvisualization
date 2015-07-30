@@ -265,7 +265,7 @@ public:
 	void reshape( int w, int h );
 
 	/** display callback */
-	void display();
+	void display(int ellapsed_time);
 
 	/** callback from the VirtualObjects if world has changed */
 	void invalidate( VirtualObject* caller = 0 );

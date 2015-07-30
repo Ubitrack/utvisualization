@@ -72,11 +72,12 @@ log4cpp::Category& loggerEvents( log4cpp::Category::getInstance( "Ubitrack.Event
 #include <utUtil/Exception.h>
 #include <utUtil/OS.h>
 #include <boost/scoped_ptr.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <iomanip>
 #include <math.h>
 
-#include "utVisualization/RenderAPI/utRenderAPIPrivate.h"
+#include "utVisualization/RenderAPI/utRenderAPI.h"
 
 
 namespace Ubitrack { namespace Drivers {
@@ -99,17 +100,30 @@ public:
 	{
 	}
 
-	virtual bool setup(VirtualWindow* window) {
+	virtual bool setup(boost::shared_ptr<VirtualWindow>& window) {
 		bool ret = CameraHandle::setup(window);
 		if (m_pVirtualCamera != NULL) {
-			m_pVirtualCamera->setup();
+			VirtualCamera::ComponentList objects = m_pVirtualCamera->getAllComponents();
+			for ( VirtualCamera::ComponentList::iterator i = objects.begin(); i != objects.end(); i++ ) {
+				(*i)->glInit();
+			}
 		}
 		return ret;
 	}
 
-	virtual void render() {
+	virtual void teardown() {
 		if (m_pVirtualCamera != NULL) {
-			m_pVirtualCamera->display();
+			VirtualCamera::ComponentList objects = m_pVirtualCamera->getAllComponents();
+			for ( VirtualCamera::ComponentList::iterator i = objects.begin(); i != objects.end(); i++ ) {
+				(*i)->glCleanup();
+			}
+		}
+		CameraHandle::teardown();
+	}
+
+	virtual void render(int ellapsed_time) {
+		if (m_pVirtualCamera != NULL) {
+			m_pVirtualCamera->display(ellapsed_time);
 		}
 	}
 
@@ -119,9 +133,9 @@ public:
 		}
 	}
 
-	virtual void on_render() {
+	virtual void on_render(int ellapsed_time) {
 		if (m_pVirtualCamera != NULL) {
-			m_pVirtualCamera->display();
+//			m_pVirtualCamera->display(ellapsed_time);
 		}
 	}
 
@@ -140,8 +154,6 @@ private:
 
 int VirtualCamera::setup()
 {
-    LOG4CPP_DEBUG( logger, "setup(): Starting setup of window for module key " << m_moduleKey );
-
 
 
 /** FULLSCREEN NOT MIGRATED .
@@ -159,15 +171,7 @@ int VirtualCamera::setup()
 
 **/
 
-    LOG4CPP_DEBUG( logger, "setup(): Window handle is " << m_winHandle );
-
-//	LOG4CPP_DEBUG( logger, "setup(): module '" << this->m_moduleKey << "' with key '" << m_winHandle << "' added to list" );
-
-	ComponentList objects = getAllComponents();
-	for ( ComponentList::iterator i = objects.begin(); i != objects.end(); i++ )
-	{
-        (*i)->glInit();
-    }
+	// setup is done in the CameraHandle setup method.
 
 	return 1;
 }
@@ -175,16 +179,16 @@ int VirtualCamera::setup()
 
 void VirtualCamera::invalidate( VirtualObject* caller )
 {
-	if (m_redraw) return;
+//	if (m_redraw) return;
 	// check if this is the last incoming update of several concurrent ones
 	ComponentList objects = getAllComponents();
 	for ( ComponentList::iterator i = objects.begin(); i != objects.end(); i++ ) {
 		if ((*i).get() == caller) continue;
 		if ((*i)->hasWaitingEvents()) return;
 	}
-	m_redraw = 1;
+//	m_redraw = 1;
 	LOG4CPP_DEBUG( logger, "invalidate(): Waking up main thread" );
-//	g_continue.notify_all();
+	RenderManager::singleton().notify_ready();
 }
 
 
@@ -192,9 +196,11 @@ void VirtualCamera::invalidate( VirtualObject* caller )
 void VirtualCamera::cleanup( VirtualObject* vo )
 {
 
-	// need to think about cleanup ..
+	// this method is called from the VirtualCameraModule in order to signal that it's done
+	// for now, all components are cleaned in the teardown of the VirtualCamera
 
-	LOG4CPP_DEBUG( logger, "cleanup(): Cleanup of component's GL context done" );
+	// dynamic deregistration only makes sense, if dynamic registration works,
+	// but this seems not to be the case for the existing GLUT implementation
 }
 
 
@@ -207,8 +213,7 @@ void VirtualCamera::redraw( )
 //	LOG4CPP_TRACE( logger, "render(): calling glutPostRedisplay" );
 //	glutPostRedisplay();
 	m_redraw = 0;
-	// directly call display here for GLFW.
-	display();
+
 }
 
 
@@ -234,8 +239,10 @@ VirtualCamera::VirtualCamera( const VirtualCameraKey& key, boost::shared_ptr< Gr
 	LOG4CPP_DEBUG( logger, "VirtualCamera(): Creating module for module key '" << m_moduleKey << "'...");
 	std::string window_name(m_moduleKey.c_str());
 
-	CameraHandle* cam = new CameraHandleImpl(window_name, m_width, m_height, this);
-	m_winHandle = RenderManager::singleton().register_camera(cam);
+	// XXX can this be simplified ??
+	boost::shared_ptr<CameraHandleImpl> cam( new CameraHandleImpl(window_name, m_width, m_height, this));
+	boost::shared_ptr<CameraHandle> cam_ = boost::dynamic_pointer_cast<CameraHandle>(cam);
+	m_winHandle = RenderManager::singleton().register_camera(cam_);
 }
 
 
@@ -302,7 +309,7 @@ Math::Vector< double, 2 > VirtualCamera::getLastMousePos() {
 
 
 
-void VirtualCamera::display()
+void VirtualCamera::display(int ellapsed_time)
 {
 	m_lastRedrawTime = Measurement::now();
 
@@ -333,12 +340,13 @@ void VirtualCamera::display()
 	glLoadIdentity();
 
 	// calculate fps
-//	int curtime = (int)(glfwGetTime() * 1000.);
-//	if ((curtime - m_lasttime) >= 1000) {
-//		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
-//		m_lasttime  = curtime;
-//		m_lastframe = curframe;
-//	}
+	int curtime = (int)(ellapsed_time);
+	if ((curtime - m_lasttime) >= 1000) {
+		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
+		m_lasttime  = curtime;
+		m_lastframe = curframe;
+	}
+
 
 	LOG4CPP_TRACE( logger, "display(): Redrawing.." );
 
@@ -415,7 +423,7 @@ void VirtualCamera::display()
 	// wait for the screen refresh
 
 	// XXX commented out for now .. maybe needs extra api
-	//m_vsync.wait( m_doSync );
+	m_vsync.wait( m_doSync );
 }
 
 

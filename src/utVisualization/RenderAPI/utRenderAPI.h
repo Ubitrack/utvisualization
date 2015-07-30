@@ -8,7 +8,9 @@
 #include <string>
 #include <map>
 #include <deque>
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #include <utVisualization/RenderAPI/Config.h>
 
@@ -18,6 +20,8 @@ namespace Ubitrack {
     }
     namespace Visualization {
 
+        class CameraHandle;
+
         class UBITRACK_EXPORT VirtualWindow {
 
         public:
@@ -26,7 +30,7 @@ namespace Ubitrack {
 
             virtual bool is_valid();
             virtual bool create();
-            virtual void initGL();
+            virtual void initGL(boost::shared_ptr<CameraHandle>& cam);
             virtual void destroy();
 
             virtual void reshape( int w, int h);
@@ -60,18 +64,18 @@ namespace Ubitrack {
             ~CameraHandle();
 
             bool need_setup();
-            virtual bool setup(VirtualWindow* window);
-            VirtualWindow* get_window();
+            virtual bool setup(boost::shared_ptr<VirtualWindow>& window);
+            boost::shared_ptr<VirtualWindow> get_window();
             virtual void teardown();
 
             /** render GL context, called from main GL thread _only_ */
-            virtual void render();
+            virtual void render(int ellapsed_time);
 
 
             // virtual callbacks for implementation
             virtual void on_window_size(int w, int h);
             virtual void on_window_close();
-            virtual void on_render();
+            virtual void on_render(int ellapsed_time);
             virtual void on_keypress(int key, int scancode, int action, int mods);
             virtual void on_cursorpos(double xpos, double ypos);
 
@@ -97,7 +101,7 @@ namespace Ubitrack {
         protected:
             int m_initial_width;
             int m_initial_height;
-            VirtualWindow* m_pVirtualWindow;
+            boost::shared_ptr<VirtualWindow> m_pVirtualWindow;
 
             std::string m_sWindowName;
             bool m_bSetupNeeded;
@@ -105,7 +109,7 @@ namespace Ubitrack {
         };
 
 
-        typedef std::map<unsigned int, CameraHandle*> CameraHandleMap;
+        typedef std::map< unsigned int, boost::shared_ptr<CameraHandle> > CameraHandleMap;
 
         // XXX should be singleton..
         class UBITRACK_EXPORT RenderManager {
@@ -115,29 +119,32 @@ namespace Ubitrack {
             ~RenderManager();
 
             bool need_setup();
-            CameraHandle* setup_pop_front();
-            void setup_push_back(CameraHandle* handle);
-
+            boost::shared_ptr<CameraHandle> setup_pop_front();
+            void setup_push_back(boost::shared_ptr<CameraHandle>& handle);
 
             CameraHandleMap::iterator cameras_begin();
             CameraHandleMap::iterator cameras_end();
 
             unsigned int camera_count();
-            CameraHandle* get_camera(unsigned int cam_id);
+            boost::shared_ptr<CameraHandle> get_camera(unsigned int cam_id);
 
-            virtual unsigned int register_camera(CameraHandle* handle);
+            virtual unsigned int register_camera(boost::shared_ptr<CameraHandle>& handle);
             virtual void unregister_camera(unsigned int cam_id);
             virtual void setup();
             virtual bool any_windows_valid();
             virtual void teardown();
-            virtual bool wait_for_event();
+
+            void notify_ready();
+            virtual bool wait_for_event(int timeout);
 
             /** get the main rendermanager object */
             static RenderManager& singleton();
 
         private:
             CameraHandleMap m_mRegisteredCameras;
-            std::deque<CameraHandle* > m_mCamerasNeedSetup;
+            std::deque< boost::shared_ptr<CameraHandle> > m_mCamerasNeedSetup;
+            boost::mutex g_globalMutex;
+            boost::condition g_continue;
             unsigned int m_iCameraCount;
             boost::mutex m_mutex;
 

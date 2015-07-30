@@ -29,12 +29,12 @@ namespace Ubitrack {
             // Implementation of Public interface
             virtual bool is_valid();
             virtual bool create();
-            virtual void initGL(CameraHandle* cam);
+            virtual void initGL(boost::shared_ptr<CameraHandle>& cam);
             virtual void destroy();
 
         private:
             GLFWwindow*	m_pWindow;
-
+            boost::shared_ptr<CameraHandle> m_pEventHandler;
         };
 
         // callback implementations for GLFW
@@ -48,7 +48,7 @@ namespace Ubitrack {
 
         inline static void WindowRefreshCallback(GLFWwindow *win) {
             CameraHandle *cam = static_cast<CameraHandle*>(glfwGetWindowUserPointer(win));
-            cam->on_render();
+            cam->on_render(glfwGetTime());
         }
 
         inline static void WindowCloseCallback(GLFWwindow *win) {

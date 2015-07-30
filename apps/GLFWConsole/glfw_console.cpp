@@ -215,15 +215,18 @@ int main( int ac, char** av )
 
 		while( !bStop && (( windows_opened == 0 ) || ( pRenderManager.any_windows_valid() )))
 		{
-			CameraHandle* cam;
-			GLFWWindowImpl* win;
+			boost::shared_ptr<CameraHandle> cam;
+			boost::shared_ptr<GLFWWindowImpl> win;
 			if (pRenderManager.need_setup()) {
 				cam = pRenderManager.setup_pop_front();
 				std::cout << "Camera setup: " << cam->title() << std::endl;
-				win = new GLFWWindowImpl(cam->initial_width(),
+				win.reset(new GLFWWindowImpl(cam->initial_width(),
 														 cam->initial_height(),
-														 cam->title());
-				if (!cam->setup(win)) {
+														 cam->title()));
+
+				// XXX can this be simplified ??
+				boost::shared_ptr<VirtualWindow> win_ = boost::dynamic_pointer_cast<VirtualWindow>(win);
+				if (!cam->setup(win_)) {
 					pRenderManager.setup_push_back(cam);
 				} else {
 					win->initGL(cam);
@@ -235,16 +238,17 @@ int main( int ac, char** av )
 			std::vector< unsigned int > chToDelete;
 			CameraHandleMap::iterator pos = pRenderManager.cameras_begin();
 			CameraHandleMap::iterator end = pRenderManager.cameras_end();
+			int ellapsed_time = (int)(glfwGetTime() * 1000.);
 			while ( pos != end ) {
 				bool is_valid = false;
 				if (pos->second) {
 					cam = pos->second;
 					if (cam->get_window()) {
-						win = static_cast<GLFWWindowImpl*>(cam->get_window());
-						if (win->is_valid()) {
+						win = boost::dynamic_pointer_cast<GLFWWindowImpl>(cam->get_window());
+						if ((win) && (win->is_valid())) {
                             win->pre_render();
 //							cam->pre_render();
-							cam->render();
+							cam->render(ellapsed_time);
 							//cam->post_render(); ??
 							is_valid = true;
                             win->post_render();  // make this loop through all current windows??
@@ -267,10 +271,7 @@ int main( int ac, char** av )
 				}
 			}
 
-
-			// XXX limit framerate to when update is needed.
-			// is this really needed ?
-//			g_continue.timed_wait( lock, boost::posix_time::milliseconds(100) );
+			pRenderManager.wait_for_event(100);
 		}
 
 		// teardown rendermanager

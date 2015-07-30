@@ -230,7 +230,7 @@ void g_mainloop()
 void g_display()
 {
 	VirtualCamera* win = g_modules[ glutGetWindow() ];
-	if ( win ) win->display();
+	if ( win ) win->display(glutGet( GLUT_ELAPSED_TIME ));
 }
 
 
@@ -553,7 +553,7 @@ Math::Vector< double, 2 > VirtualCamera::getLastMousePos() {
 
 
 
-void VirtualCamera::display()
+void VirtualCamera::display(int ellapsed_time)
 {
 	m_lastRedrawTime = Measurement::now();
 
@@ -584,7 +584,7 @@ void VirtualCamera::display()
 	glLoadIdentity();
 
 	// calculate fps
-	int curtime = glutGet( GLUT_ELAPSED_TIME );
+	int curtime = ellapsed_time;
 	if ((curtime - m_lasttime) >= 1000) {
 		m_fps = (1000.0*(curframe-m_lastframe))/((double)(curtime-m_lasttime));
 		m_lasttime  = curtime;

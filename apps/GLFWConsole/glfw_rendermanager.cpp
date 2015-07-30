@@ -27,7 +27,7 @@ bool GLFWWindowImpl::create() {
     return m_pWindow != NULL;
 }
 
-void GLFWWindowImpl::initGL(CameraHandle* event_handler) {
+void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
     // log error ??
     if (m_pWindow == NULL)
         return;
@@ -82,7 +82,8 @@ void GLFWWindowImpl::initGL(CameraHandle* event_handler) {
     glEnable(GL_NORMALIZE);
 
     // setup callbacks:
-    glfwSetWindowUserPointer(m_pWindow, event_handler);
+    m_pEventHandler = event_handler;
+    glfwSetWindowUserPointer(m_pWindow, event_handler.get());
 
     // which one is the better window-size callback in GLFW ??
     //glfwSetWindowSizeCallback(m_pWindow, WindowResizeCallback);
@@ -96,9 +97,11 @@ void GLFWWindowImpl::initGL(CameraHandle* event_handler) {
 
 void GLFWWindowImpl::destroy() {
     if (m_pWindow != NULL) {
+        glfwSetWindowUserPointer(m_pWindow, NULL);
         glfwDestroyWindow(m_pWindow);
         m_pWindow = NULL;
     }
+    m_pEventHandler.reset();
 }
 
 

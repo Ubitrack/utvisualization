@@ -35,7 +35,7 @@ void VirtualWindow::destroy() {
 
 }
 
-void VirtualWindow::initGL() {
+void VirtualWindow::initGL(boost::shared_ptr<CameraHandle>& cam) {
 
 }
 
@@ -43,12 +43,12 @@ void VirtualWindow::reshape(int w, int h) {
 
 }
 
-CameraHandle::CameraHandle(std::string &_name, int _width, int _height, Drivers::VirtualCamera *_handle)
+CameraHandle::CameraHandle(std::string &_name, int _width, int _height, Drivers::VirtualCamera* _handle)
         : m_sWindowName(_name)
         , m_initial_width(_width)
         , m_initial_height(_height)
         , m_bSetupNeeded(true)
-        , m_pVirtualWindow(NULL)
+        , m_pVirtualWindow()
         , m_pVirtualCamera(_handle)
 {
 
@@ -62,11 +62,11 @@ bool CameraHandle::need_setup() {
     return m_bSetupNeeded;
 }
 
-VirtualWindow* CameraHandle::get_window() {
+boost::shared_ptr<VirtualWindow> CameraHandle::get_window() {
     return m_pVirtualWindow;
 }
 
-bool CameraHandle::setup(VirtualWindow *window) {
+bool CameraHandle::setup(boost::shared_ptr<VirtualWindow>& window) {
     m_pVirtualWindow = window;
     if (window->create()) {
         // do something to window..
@@ -78,12 +78,12 @@ bool CameraHandle::setup(VirtualWindow *window) {
 
 void CameraHandle::teardown() {
 
-    if (m_pVirtualWindow != NULL) {
+    if (m_pVirtualWindow) {
         m_pVirtualWindow->destroy();
     }
 }
 
-void CameraHandle::render() {
+void CameraHandle::render(int ellapsed_time) {
     // extend in subclass
 }
 
@@ -102,7 +102,7 @@ void CameraHandle::on_keypress(int key, int scancode, int action, int mods) {
 }
 
 
-void CameraHandle::on_render() {
+void CameraHandle::on_render(int ellapsed_time) {
 
 }
 
@@ -162,17 +162,17 @@ bool RenderManager::any_windows_valid() {
     return awv;
 }
 
-CameraHandle *RenderManager::setup_pop_front() {
+boost::shared_ptr<CameraHandle> RenderManager::setup_pop_front() {
     boost::mutex::scoped_lock lock( m_mutex );
+    boost::shared_ptr<CameraHandle> cam;
     if (m_mCamerasNeedSetup.size() > 0) {
-        CameraHandle* cam = m_mCamerasNeedSetup.front();
+        cam = m_mCamerasNeedSetup.front();
         m_mCamerasNeedSetup.pop_front();
-        return cam;
     }
-    return NULL;
+    return cam;
 }
 
-void RenderManager::setup_push_back(CameraHandle *handle) {
+void RenderManager::setup_push_back(boost::shared_ptr<CameraHandle>& handle) {
     boost::mutex::scoped_lock lock( m_mutex );
     m_mCamerasNeedSetup.push_back(handle);
 }
@@ -191,12 +191,17 @@ CameraHandleMap::iterator RenderManager::cameras_end() {
     return m_mRegisteredCameras.end();
 }
 
-bool RenderManager::wait_for_event() {
-    // not implemented
-    return false;
+void RenderManager::notify_ready() {
+    boost::mutex::scoped_lock lock( g_globalMutex );
+    g_continue.notify_all();
 }
 
-unsigned int RenderManager::register_camera(CameraHandle *handle) {
+bool RenderManager::wait_for_event(int wait_time) {
+    boost::mutex::scoped_lock lock( g_globalMutex );
+    return g_continue.timed_wait( lock, boost::posix_time::milliseconds(wait_time) );
+}
+
+unsigned int RenderManager::register_camera(boost::shared_ptr<CameraHandle>& handle) {
     boost::mutex::scoped_lock lock( m_mutex );
     unsigned int new_id = m_iCameraCount++;
     m_mRegisteredCameras[new_id] = handle;
@@ -216,10 +221,11 @@ unsigned int RenderManager::camera_count() {
     return m_iCameraCount;
 }
 
-CameraHandle *RenderManager::get_camera(unsigned int cam_id) {
+boost::shared_ptr<CameraHandle> RenderManager::get_camera(unsigned int cam_id) {
     boost::mutex::scoped_lock lock( m_mutex );
+    boost::shared_ptr<CameraHandle> cam;
     if (m_mRegisteredCameras.find(cam_id) != m_mRegisteredCameras.end()) {
-        return m_mRegisteredCameras[cam_id];
+        cam = m_mRegisteredCameras[cam_id];
     }
-    return NULL;
+    return cam;
 }
