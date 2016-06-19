@@ -1,4 +1,4 @@
-#include "utRenderAPIPrivate.h"
+#include "utRenderAPI.h"
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -122,7 +122,7 @@ void CameraHandle::keyboard(unsigned char key, int x, int y) {
 
 RenderManager& RenderManager::singleton()
 {
-    // race condition between network receiving thread and main thread
+    // prevent from race condition
     static boost::mutex singletonMutex;
     boost::mutex::scoped_lock l( singletonMutex );
 
@@ -194,12 +194,26 @@ CameraHandleMap::iterator RenderManager::cameras_end() {
 void RenderManager::notify_ready() {
     boost::mutex::scoped_lock lock( g_globalMutex );
     g_continue.notify_all();
+
+    if (m_notification_slot) {
+        m_notification_slot( );
+    }
+
 }
 
 bool RenderManager::wait_for_event(int wait_time) {
     boost::mutex::scoped_lock lock( g_globalMutex );
     return g_continue.timed_wait( lock, boost::posix_time::milliseconds(wait_time) );
 }
+
+void RenderManager::register_notify_callback(CallbackType cb) {
+    m_notification_slot = cb;
+}
+
+void RenderManager::unregister_notify_callback() {
+    m_notification_slot = NULL;
+}
+
 
 unsigned int RenderManager::register_camera(boost::shared_ptr<CameraHandle>& handle) {
     boost::mutex::scoped_lock lock( m_mutex );

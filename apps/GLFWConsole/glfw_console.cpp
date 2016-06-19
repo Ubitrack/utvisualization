@@ -252,7 +252,8 @@ int main( int ac, char** av )
 							//cam->post_render(); ??
 							is_valid = true;
                             win->post_render();  // make this loop through all current windows??
-                            CheckForGLErrors("Render Error");						}
+                            CheckForGLErrors("Render Error");
+						}
 					}
 				}
 				pos++;

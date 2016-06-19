@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 #include <deque>
+#include <functional>
+#include <memory>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -111,10 +113,12 @@ namespace Ubitrack {
 
         typedef std::map< unsigned int, boost::shared_ptr<CameraHandle> > CameraHandleMap;
 
-        // XXX should be singleton..
         class UBITRACK_EXPORT RenderManager {
 
         public:
+
+            typedef std::function<void()> CallbackType;
+
             RenderManager();
             ~RenderManager();
 
@@ -128,14 +132,18 @@ namespace Ubitrack {
             unsigned int camera_count();
             boost::shared_ptr<CameraHandle> get_camera(unsigned int cam_id);
 
-            virtual unsigned int register_camera(boost::shared_ptr<CameraHandle>& handle);
-            virtual void unregister_camera(unsigned int cam_id);
-            virtual void setup();
-            virtual bool any_windows_valid();
-            virtual void teardown();
+            unsigned int register_camera(boost::shared_ptr<CameraHandle>& handle);
+            void unregister_camera(unsigned int cam_id);
+            void setup();
+            bool any_windows_valid();
+            void teardown();
 
             void notify_ready();
-            virtual bool wait_for_event(int timeout);
+            bool wait_for_event(int timeout);
+            void register_notify_callback(CallbackType cb);
+            void unregister_notify_callback();
+
+
 
             /** get the main rendermanager object */
             static RenderManager& singleton();
@@ -147,6 +155,7 @@ namespace Ubitrack {
             boost::condition g_continue;
             unsigned int m_iCameraCount;
             boost::mutex m_mutex;
+            CallbackType m_notification_slot;
 
         };
 
