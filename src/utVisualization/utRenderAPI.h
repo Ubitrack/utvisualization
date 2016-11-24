@@ -14,7 +14,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 
-#include <utVisualization/RenderAPI/Config.h>
+#include <utVisualization/Config.h>
 
 namespace Ubitrack {
     namespace Drivers {
