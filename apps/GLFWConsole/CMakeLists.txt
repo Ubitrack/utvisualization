@@ -1,5 +1,5 @@
 set(the_description "The UbiTrack utGLFWConsole app")
-ut_add_app(utGLFWConsole DEPS utcore utdataflow utfacade utvision utrenderapi)
+ut_add_app(utGLFWConsole DEPS utcore utdataflow utfacade utvision utvisualization)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
 

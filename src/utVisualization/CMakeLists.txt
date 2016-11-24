@@ -1,6 +1,6 @@
 set(the_description "The UbiTrack Visualization Library")
 ut_add_module(utvisualization utcore utdataflow utvision)
-ut_module_include_directories(utrenderapi ${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENCV_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/../../")
+ut_module_include_directories(utrenderapi ${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENCV_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/../")
 ut_glob_module_sources(HEADERS "*.h" SOURCES "*.cpp")
 
 # writes config file into binary_dir, so sourcetree will not be cluttered
