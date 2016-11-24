@@ -62,7 +62,7 @@
 #include <utUtil/OS.h>
 
 #include "glfw_rendermanager.h"
-#include "utVisualization/RenderAPI/utRenderAPI.h"
+#include "utVisualization/utRenderAPI.h"
 
 
 using namespace Ubitrack;

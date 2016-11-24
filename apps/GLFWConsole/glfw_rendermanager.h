@@ -12,7 +12,7 @@
 #endif
 #include <GLFW/glfw3.h>
 
-#include <utVisualization/RenderAPI/utRenderAPI.h>
+#include <utVisualization/utRenderAPI.h>
 
 namespace Ubitrack {
     namespace Visualization {
