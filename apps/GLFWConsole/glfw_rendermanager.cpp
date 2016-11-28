@@ -22,8 +22,10 @@ bool GLFWWindowImpl::is_valid() {
 }
 
 bool GLFWWindowImpl::create() {
+	std::cout << "Create GLFW Window." << std::endl;
     m_pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
-    // set fullscreen ?
+	glfwMakeContextCurrent(m_pWindow);
+	// set fullscreen ?
     return m_pWindow != NULL;
 }
 
@@ -32,9 +34,12 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
     if (m_pWindow == NULL)
         return;
 
+	glfwMakeContextCurrent(m_pWindow);
+
 #ifdef HAVE_GLEW
     // Init GLEW for this context:
-    GLenum err = glewInit();
+	std::cout << "Initialize GLEW." << std::endl;
+	GLenum err = glewInit();
     if (err != GLEW_OK)
     {
         // a problem occured when trying to init glew, report it:

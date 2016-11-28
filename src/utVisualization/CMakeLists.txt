@@ -4,6 +4,7 @@ ut_add_module(utvisualization utcore utdataflow utvision)
 FIND_PACKAGE(GLEW)
 IF(GLEW_FOUND)
 	add_definitions(-DHAVE_GLEW)
+	set(HAVE_GLEW 1)
 ENDIF(GLEW_FOUND)
 
 ut_module_include_directories(utvisualization ${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENCV_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR}  ${GLEW_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/../")

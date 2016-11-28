@@ -6,6 +6,9 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/function.hpp>
 
+
+#include <utVision/OpenCLManager.h>
+
 using namespace Ubitrack;
 using namespace Ubitrack::Visualization;
 
@@ -146,6 +149,16 @@ RenderManager::~RenderManager() {
 
 void RenderManager::setup() {
     // anything to do here ... most setup should be done in the client
+
+	// access OCL Manager and initialize if needed
+	Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
+	if (!oclManager.isInitialized())
+	{
+		if (oclManager.isEnabled()) {
+			oclManager.initializeOpenGL();
+		}
+		return;
+	}
 }
 
 bool RenderManager::need_setup() {

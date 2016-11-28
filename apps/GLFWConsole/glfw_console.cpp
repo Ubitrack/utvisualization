@@ -231,6 +231,9 @@ int main( int ac, char** av )
 					pRenderManager.setup_push_back(cam);
 				} else {
 					win->initGL(cam);
+#ifdef WIN32
+					Util::sleep(30);
+#endif
 					windows_opened++;
 				}
                 glfwPollEvents();
