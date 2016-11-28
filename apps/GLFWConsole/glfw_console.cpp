@@ -22,32 +22,33 @@
  */
 
 
+
+#ifdef HAVE_GLEW
+	#include "GL/glew.h"
+#endif
+
+#ifdef _WIN32
+	#include <utUtil/CleanWindows.h>
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+#elif __APPLE__
+	#include <OpenGL/OpenGL.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glext.h> // Linux headers
+	#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
+	#include <GL/glu.h>
+#endif
+
+#include <GLFW/glfw3.h>
+
 #include <stdlib.h>
 #include <signal.h>
 #include <iostream>
 #include <vector>
 #ifdef _WIN32
 #include <conio.h>
-#endif
-
-
-#ifdef HAVE_GLEW
-	#include "GL/glew.h"
-#endif
-
-#include <GLFW/glfw3.h>
-
-#ifdef _WIN32
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-	#include <utUtil/CleanWindows.h>
-#elif __APPLE__
-    #include <OpenGL/OpenGL.h>
-    #include <OpenGL/glu.h>
-#else
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-	#include <GL/glx.h>
 #endif
 
 

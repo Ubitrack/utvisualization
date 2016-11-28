@@ -113,6 +113,8 @@ namespace Ubitrack {
 
         typedef std::map< unsigned int, boost::shared_ptr<CameraHandle> > CameraHandleMap;
 
+
+
         class UBITRACK_EXPORT RenderManager {
 
         public:
@@ -149,13 +151,14 @@ namespace Ubitrack {
             static RenderManager& singleton();
 
         private:
-            CameraHandleMap m_mRegisteredCameras;
+
+			CameraHandleMap m_mRegisteredCameras;
             std::deque< boost::shared_ptr<CameraHandle> > m_mCamerasNeedSetup;
             boost::mutex g_globalMutex;
             boost::condition g_continue;
             unsigned int m_iCameraCount;
             boost::mutex m_mutex;
-            CallbackType m_notification_slot;
+			CallbackType m_notification_slot;
 
         };
 

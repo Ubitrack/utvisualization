@@ -211,7 +211,12 @@ void RenderManager::register_notify_callback(CallbackType cb) {
 }
 
 void RenderManager::unregister_notify_callback() {
+	// still struggling with C++11 nullptr vs NULL with different platforms/compilers ..
+#if defined (COMPILER_USE_CXX11) && defined (WIN32)
+	m_notification_slot = nullptr;
+#else
     m_notification_slot = NULL;
+#endif
 }
 
 

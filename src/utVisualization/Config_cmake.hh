@@ -5,7 +5,7 @@
 
 #ifdef _WIN32
 // fix for simplified build scripts (ulrich eck)
-#   ifdef UTRENDERAPI_DLL
+#   ifdef UTVISUALIZATION_DLL
 #       define UBITRACK_DLL
 #   endif
 #	ifdef UBITRACK_DLL
@@ -20,19 +20,10 @@
 #ifndef HAVE_GLEW
 #cmakedefine HAVE_GLEW
 #endif
-#ifndef HAVE_FREEGLUT 
-#cmakedefine HAVE_FREEGLUT
-#endif
 #ifndef HAVE_LAPACK 
 #cmakedefine HAVE_LAPACK
 #endif
 #ifndef HAVE_OPENCV 
 #cmakedefine HAVE_OPENCV
-#endif
-#ifndef HAVE_COIN 
-#cmakedefine HAVE_COIN
-#endif
-#ifndef HAVE_DIRECTSHOW 
-#cmakedefine HAVE_DIRECTSHOW
 #endif
 #endif
