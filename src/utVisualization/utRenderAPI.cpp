@@ -72,8 +72,15 @@ boost::shared_ptr<VirtualWindow> CameraHandle::get_window() {
 bool CameraHandle::setup(boost::shared_ptr<VirtualWindow>& window) {
     m_pVirtualWindow = window;
     if (window->create()) {
-        // do something to window..
-        // extend in subclass
+
+        // access OCL Manager and initialize if needed
+        Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
+        if (!oclManager.isInitialized())
+        {
+            if (oclManager.isEnabled()) {
+                oclManager.initializeOpenGL();
+            }
+        }
         return true;
     }
     return false;
@@ -150,15 +157,6 @@ RenderManager::~RenderManager() {
 void RenderManager::setup() {
     // anything to do here ... most setup should be done in the client
 
-	// access OCL Manager and initialize if needed
-	Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
-	if (!oclManager.isInitialized())
-	{
-		if (oclManager.isEnabled()) {
-			oclManager.initializeOpenGL();
-		}
-		return;
-	}
 }
 
 bool RenderManager::need_setup() {
