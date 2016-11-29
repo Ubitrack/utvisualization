@@ -92,14 +92,13 @@ int main( int ac, char** av )
 	
 	try
 	{
-		// initialize logging		
-		Util::initLogging();
 
 		// program options
 		std::string sServerAddress;
 		std::string sUtqlFile;
 		std::string sExtraUtqlFile;
 		std::string sComponentsPath;
+		std::string sLogConfig = "log4cpp.conf";
 		bool bNoExit;
 
 		try
@@ -111,7 +110,8 @@ int main( int ac, char** av )
 				( "help", "print this help message" )
 				( "server,s", po::value< std::string >( &sServerAddress ), "Ubitrack server address <host>[:<port>] to connect to" )
 				( "components_path", po::value< std::string >( &sComponentsPath ), "Directory from which to load components" )
-				( "utql", po::value< std::string >( &sUtqlFile ), "UTQL request or response file, depending on whether a server is specified. "
+				("log_config", po::value< std::string >(&sLogConfig), "Logging configuration file")
+				("utql", po::value< std::string >(&sUtqlFile), "UTQL request or response file, depending on whether a server is specified. "
 					"Without specifying this option, the UTQL file can also be given directly on the command line." )
 				( "extra-dataflow", po::value< std::string >( &sExtraUtqlFile ), "Additional UTQL response file to be loaded directly without using the server" )
 				( "noexit", "do not exit on return" )
@@ -164,7 +164,9 @@ int main( int ac, char** av )
 				return 1;
 			}
 			
-			
+			// initialize logging		
+			Util::initLogging(sLogConfig.c_str());
+
 		}
 		catch( std::exception& e )
 		{
@@ -218,7 +220,7 @@ int main( int ac, char** av )
 		{
 			boost::shared_ptr<CameraHandle> cam;
 			boost::shared_ptr<GLFWWindowImpl> win;
-			if (pRenderManager.need_setup()) {
+			while (pRenderManager.need_setup()) {
 				cam = pRenderManager.setup_pop_front();
 				std::cout << "Camera setup: " << cam->title() << std::endl;
 				win.reset(new GLFWWindowImpl(cam->initial_width(),
@@ -260,11 +262,11 @@ int main( int ac, char** av )
 						}
 					}
 				}
-				pos++;
 				if (!is_valid) {
 					chToDelete.push_back(pos->first);
 				}
-                glfwPollEvents();
+				pos++;
+				glfwPollEvents();
 			}
 
 			if (chToDelete.size() > 0) {

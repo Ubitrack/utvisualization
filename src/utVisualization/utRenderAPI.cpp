@@ -6,11 +6,13 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/function.hpp>
 
-
+#include <log4cpp/Category.hh>
 #include <utVision/OpenCLManager.h>
 
 using namespace Ubitrack;
 using namespace Ubitrack::Visualization;
+
+log4cpp::Category& logger(log4cpp::Category::getInstance("utVisualization.RenderAPI"));
 
 // the singleton render manager object
 static boost::scoped_ptr< RenderManager > g_pRenderManager;
@@ -70,6 +72,7 @@ boost::shared_ptr<VirtualWindow> CameraHandle::get_window() {
 }
 
 bool CameraHandle::setup(boost::shared_ptr<VirtualWindow>& window) {
+	LOG4CPP_DEBUG(logger, "CameraHandle setup.");
     m_pVirtualWindow = window;
     if (window->create()) {
 
@@ -87,7 +90,7 @@ bool CameraHandle::setup(boost::shared_ptr<VirtualWindow>& window) {
 }
 
 void CameraHandle::teardown() {
-
+	LOG4CPP_DEBUG(logger, "CameraHandle teardown.");
     if (m_pVirtualWindow) {
         m_pVirtualWindow->destroy();
     }
@@ -232,7 +235,8 @@ void RenderManager::unregister_notify_callback() {
 
 
 unsigned int RenderManager::register_camera(boost::shared_ptr<CameraHandle>& handle) {
-    boost::mutex::scoped_lock lock( m_mutex );
+	LOG4CPP_DEBUG(logger, "RenderManager register_camera.");
+	boost::mutex::scoped_lock lock(m_mutex);
     unsigned int new_id = m_iCameraCount++;
     m_mRegisteredCameras[new_id] = handle;
     m_mCamerasNeedSetup.push_back(handle);
@@ -240,7 +244,8 @@ unsigned int RenderManager::register_camera(boost::shared_ptr<CameraHandle>& han
 }
 
 void RenderManager::unregister_camera(unsigned int cam_id) {
-    boost::mutex::scoped_lock lock( m_mutex );
+	LOG4CPP_DEBUG(logger, "RenderManager unregister_camera.");
+	boost::mutex::scoped_lock lock(m_mutex);
     if (m_mRegisteredCameras.find(cam_id) != m_mRegisteredCameras.end()) {
         m_mRegisteredCameras.erase(cam_id);
     }
