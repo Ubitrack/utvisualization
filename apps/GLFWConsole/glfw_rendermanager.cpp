@@ -8,7 +8,11 @@ using namespace Ubitrack::Visualization;
 
 
 GLFWWindowImpl::GLFWWindowImpl(int _width, int _height, const std::string &_title)
-        : VirtualWindow(_width, _height, _title), m_pWindow(NULL) {
+        : VirtualWindow(_width, _height, _title), m_pWindow(NULL)
+//        , m_lastWidth(_width)
+//        , m_lastHeight(_height)
+//        , m_isFullscreen(false)
+{
 
 }
 
