@@ -9,9 +9,6 @@ using namespace Ubitrack::Visualization;
 
 GLFWWindowImpl::GLFWWindowImpl(int _width, int _height, const std::string &_title)
         : VirtualWindow(_width, _height, _title), m_pWindow(NULL)
-//        , m_lastWidth(_width)
-//        , m_lastHeight(_height)
-//        , m_isFullscreen(false)
 {
 
 }
@@ -31,6 +28,33 @@ bool GLFWWindowImpl::create() {
 	glfwMakeContextCurrent(m_pWindow);
 	// set fullscreen ?
     return m_pWindow != NULL;
+}
+
+void GLFWWindowImpl::reshape(int w, int h) {
+	VirtualWindow::reshape(w, h);
+}
+
+
+void GLFWWindowImpl::setFullscreen(bool fullscreen) {
+	if (!m_pWindow) {
+		return;
+	}
+	if (fullscreen) {
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(m_pWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+	}
+	else {
+		CameraHandle *cam = static_cast<CameraHandle*>(glfwGetWindowUserPointer(m_pWindow));
+		glfwSetWindowMonitor(m_pWindow, NULL, 0, 0, cam->initial_width(), cam->initial_height(), 0);
+	}
+}
+
+void GLFWWindowImpl::onExit() {
+	if (m_pWindow) {
+		std::cout << "Request to close window." << std::endl;
+		glfwSetWindowShouldClose(m_pWindow, GLFW_TRUE);
+	}
 }
 
 void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {

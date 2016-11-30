@@ -3,7 +3,7 @@ ut_add_app(utGLFWConsole DEPS utcore utdataflow utfacade utvision utvisualizatio
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
 
-FIND_PACKAGE(GLFW)
+FIND_PACKAGE(GLFW 3.2)
 FIND_PACKAGE(GLEW)
 IF(GLEW_FOUND)
 	SET(HAVE_GLEW 1)

@@ -26,6 +26,13 @@ namespace Ubitrack {
             virtual void pre_render();
             virtual void post_render();
 
+			virtual void reshape(int w, int h);
+
+			//custom extensions
+			virtual void setFullscreen(bool fullscreen);
+			virtual void onExit();
+
+
             // Implementation of Public interface
             virtual bool is_valid();
             virtual bool create();
@@ -62,46 +69,25 @@ namespace Ubitrack {
                                              int action,
                                              int mods) {
             CameraHandle *cam = static_cast<CameraHandle*>(glfwGetWindowUserPointer(win));
-//            if ((mods & GLFW_MOD_ALT ) && (action == GLFW_PRESS)) {
-//                switch(key) {
-//                case GLFW_KEY_F:
-//                    if (m_isFullscreen) {
-//
-//                    }
-//                    GLFWmonitor* monitor = glfwGetWindowMonitor(win);
-//                    const GLFWvidmode* wmode = glfwGetVideoMode(monitor);
-//                    glfwSetWindowMonitor(win, monitor, 0, 0, wmode->width, wmode->height, wmode->refreshRate);
-//                    break;
-//                case GLFW_KEY_Q:
-//                    break;
-//                default:
-//                    // should convert from GLFW to some common format here ..
-//                    cam->on_keypress(key, scancode, action, mods);
-//                }
-//
-//            }
-            /** accessing the alt-modifier needs a change in the function signature.
-            if (glutGetModifiers() & GLUT_ACTIVE_ALT)
-            {
-                switch ( key )
-                {
-                    case 'f':
-                        #ifdef	_WIN32
-                            // need to work around freeglut for multi-monitor fullscreen
-                            makeWindowFullscreen( m_moduleKey, Math::Vector< int, 2 >( 0xFFFF, 0xFFFF ) );
-                        #else
-        //					glutFullScreen();
-                        #endif
-                        break;
-                    case 'i': m_info = !m_info; break;
-                    case 'v': m_doSync = !m_doSync; break;
-                    case 's': m_parity = !m_parity; break;
-                    // case 'q': delete this; break;
-                }
-            }
-            else
-            **/
-            cam->on_keypress(key, scancode, action, mods);
+			if ((action == GLFW_PRESS) && (mods & GLFW_MOD_ALT)) {
+				switch (key) {
+				case GLFW_KEY_F:
+					cam->on_fullscreen();
+					return;
+				default:
+					break;
+				}
+			}
+			if (action == GLFW_PRESS) {
+				switch (key) {
+				case GLFW_KEY_ESCAPE:
+					cam->on_exit();
+					return;
+				default:
+					break;
+				}
+			}
+			cam->on_keypress(key, scancode, action, mods);
         }
 
 

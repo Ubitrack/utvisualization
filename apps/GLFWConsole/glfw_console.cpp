@@ -224,8 +224,8 @@ int main( int ac, char** av )
 				cam = pRenderManager.setup_pop_front();
 				std::cout << "Camera setup: " << cam->title() << std::endl;
 				win.reset(new GLFWWindowImpl(cam->initial_width(),
-														 cam->initial_height(),
-														 cam->title()));
+											 cam->initial_height(),
+											 cam->title()));
 
 				// XXX can this be simplified ??
 				boost::shared_ptr<VirtualWindow> win_ = boost::dynamic_pointer_cast<VirtualWindow>(win);
@@ -277,7 +277,7 @@ int main( int ac, char** av )
                     glfwPollEvents();
 				}
 			}
-
+			// need a way to exit the loop here ..
 			pRenderManager.wait_for_event(100);
 		}
 

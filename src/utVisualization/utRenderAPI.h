@@ -37,6 +37,10 @@ namespace Ubitrack {
 
             virtual void reshape( int w, int h);
 
+			// custom extensions
+			virtual void setFullscreen(bool fullscreen);
+			virtual void onExit();
+
             //virtual void post_redraw();
 
             int width() {
@@ -78,8 +82,13 @@ namespace Ubitrack {
             virtual void on_window_size(int w, int h);
             virtual void on_window_close();
             virtual void on_render(int ellapsed_time);
-            virtual void on_keypress(int key, int scancode, int action, int mods);
-            virtual void on_cursorpos(double xpos, double ypos);
+            virtual int on_keypress(int key, int scancode, int action, int mods);
+            virtual int on_cursorpos(double xpos, double ypos);
+
+			// extended commands from frontend
+			virtual void on_fullscreen();
+			virtual void on_exit();
+
 
             // maybe needed for external renderloop synchronization
             virtual void post_redraw();
@@ -107,6 +116,7 @@ namespace Ubitrack {
 
             std::string m_sWindowName;
             bool m_bSetupNeeded;
+			bool m_bIsFullScreen;
             Drivers::VirtualCamera* m_pVirtualCamera;
         };
 

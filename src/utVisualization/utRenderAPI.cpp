@@ -45,7 +45,12 @@ void VirtualWindow::initGL(boost::shared_ptr<CameraHandle>& cam) {
 }
 
 void VirtualWindow::reshape(int w, int h) {
+}
 
+void VirtualWindow::setFullscreen(bool fullscreen) {
+}
+
+void VirtualWindow::onExit() {
 }
 
 CameraHandle::CameraHandle(std::string &_name, int _width, int _height, Drivers::VirtualCamera* _handle)
@@ -53,6 +58,7 @@ CameraHandle::CameraHandle(std::string &_name, int _width, int _height, Drivers:
         , m_initial_width(_width)
         , m_initial_height(_height)
         , m_bSetupNeeded(true)
+		, m_bIsFullScreen(false)
         , m_pVirtualWindow()
         , m_pVirtualCamera(_handle)
 {
@@ -103,28 +109,52 @@ void CameraHandle::render(int ellapsed_time) {
 
 
 void CameraHandle::on_window_size(int w, int h) {
-
+	LOG4CPP_DEBUG(logger, "CameraHandle window resize: " << w << "x" << h);
+	if (m_pVirtualWindow) {
+		m_pVirtualWindow->reshape(w, h);
+	}
 }
 
 void CameraHandle::on_window_close() {
 
 }
 
-void CameraHandle::on_keypress(int key, int scancode, int action, int mods) {
-
+int CameraHandle::on_keypress(int key, int scancode, int action, int mods) {
+	// event is not handled by default;
+	return 0;
 }
 
 
 void CameraHandle::on_render(int ellapsed_time) {
-
+	// extend in subclass
 }
 
-void CameraHandle::on_cursorpos(double xpos, double ypos) {
+int CameraHandle::on_cursorpos(double xpos, double ypos) {
 
+	// event is not handled by default;
+	return 0;
+}
+
+void CameraHandle::on_fullscreen() {
+	if (m_bIsFullScreen) {
+		m_bIsFullScreen = false;
+	}
+	else {
+		LOG4CPP_INFO(logger, "Set Fullscreen.");
+		m_bIsFullScreen = true;
+	}
+	if (m_pVirtualWindow) {
+		m_pVirtualWindow->setFullscreen(m_bIsFullScreen);
+	}
+}
+
+void CameraHandle::on_exit() {
+	if (m_pVirtualWindow) {
+		m_pVirtualWindow->onExit();
+	}
 }
 
 void CameraHandle::post_redraw() {
-    // maybe needed
 }
 
 void CameraHandle::keyboard(unsigned char key, int x, int y) {
