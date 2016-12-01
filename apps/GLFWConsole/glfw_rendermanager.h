@@ -84,10 +84,10 @@ namespace Ubitrack {
 					cam->on_exit();
 					return;
 				default:
+					cam->on_keypress(key, scancode, action, mods);
 					break;
 				}
 			}
-			cam->on_keypress(key, scancode, action, mods);
         }
 
 
