@@ -37,7 +37,7 @@
 #else
 	#include <GL/gl.h>
 	#include <GL/glext.h> // Linux headers
-	#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
+	//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
 	#include <GL/glu.h>
 #endif
 

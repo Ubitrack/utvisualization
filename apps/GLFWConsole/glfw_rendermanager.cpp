@@ -39,6 +39,7 @@ void GLFWWindowImpl::setFullscreen(bool fullscreen) {
 	if (!m_pWindow) {
 		return;
 	}
+#if (defined(GLFW_VERSION_MAJOR) && (GLFW_VERSION_MAJOR >= 3) && (GLFW_VERSION_MINOR >= 2))
 	if (fullscreen) {
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -48,12 +49,15 @@ void GLFWWindowImpl::setFullscreen(bool fullscreen) {
 		CameraHandle *cam = static_cast<CameraHandle*>(glfwGetWindowUserPointer(m_pWindow));
 		glfwSetWindowMonitor(m_pWindow, NULL, 0, 0, cam->initial_width(), cam->initial_height(), 0);
 	}
+#else
+	std::cout << "GLFW Version below 3.2 does not support switching to fullscreen during runtime" << std::endl;
+#endif
 }
 
 void GLFWWindowImpl::onExit() {
 	if (m_pWindow) {
 		std::cout << "Request to close window." << std::endl;
-		glfwSetWindowShouldClose(m_pWindow, GLFW_TRUE);
+		glfwSetWindowShouldClose(m_pWindow, 1);
 	}
 }
 
