@@ -2,8 +2,8 @@
 // Created by Ulrich Eck on 26/07/2015.
 //
 
-#ifndef UBITACK_GLFW_RENDERMANAGER_H
-#define UBITACK_GLFW_RENDERMANAGER_H
+#ifndef UBITRACK_GLFW_RENDERMANAGER_H
+#define UBITRACK_GLFW_RENDERMANAGER_H
 
 #include <string>
 
@@ -101,4 +101,4 @@ namespace Ubitrack {
     }
 }
 
-#endif //UBITACK_GLFW_RENDERMANAGER_H
+#endif //UBITRACK_GLFW_RENDERMANAGER_H

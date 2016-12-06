@@ -2,8 +2,8 @@
 // Created by Ulrich Eck on 26/07/2015.
 //
 
-#ifndef UBITACK_UTRENDERAPI_H
-#define UBITACK_UTRENDERAPI_H
+#ifndef UBITRACK_UTRENDERAPI_H
+#define UBITRACK_UTRENDERAPI_H
 
 #include <string>
 #include <map>
@@ -176,4 +176,4 @@ namespace Ubitrack {
 };
 
 
-#endif //UBITACK_UTRENDERAPI_H
+#endif //UBITRACK_UTRENDERAPI_H
