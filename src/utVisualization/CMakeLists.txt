@@ -14,4 +14,4 @@ ut_glob_module_sources(HEADERS "*.h" SOURCES "*.cpp")
 configure_file(Config_cmake.hh ${CMAKE_CURRENT_SOURCE_DIR}/Config.h)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Config.h" DESTINATION "${UBITRACK_INCLUDE_INSTALL_PATH}/utVisualization" COMPONENT dev)
 
-ut_create_module(${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
+ut_create_module(${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
