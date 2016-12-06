@@ -134,6 +134,9 @@ namespace Ubitrack {
             RenderManager();
             ~RenderManager();
 
+			void setSharedOpenGLContext(void* ctx);
+			void* getSharedOpenGLContext();
+
             bool need_setup();
             boost::shared_ptr<CameraHandle> setup_pop_front();
             void setup_push_back(boost::shared_ptr<CameraHandle>& handle);
@@ -169,6 +172,8 @@ namespace Ubitrack {
             unsigned int m_iCameraCount;
             boost::mutex m_mutex;
 			CallbackType m_notification_slot;
+
+			void* m_sharedOpenGLContext;
 
         };
 
