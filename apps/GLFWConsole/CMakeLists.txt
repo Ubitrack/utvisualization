@@ -3,7 +3,7 @@ ut_add_app(utGLFWConsole DEPS utcore utdataflow utfacade utvision utvisualizatio
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
 
-FIND_PACKAGE(GLFW 3.2)
+FIND_PACKAGE(GLFW)
 FIND_PACKAGE(GLEW)
 IF(GLEW_FOUND)
 	SET(HAVE_GLEW 1)
@@ -14,6 +14,7 @@ IF(GLFW_FOUND)
 ut_app_include_directories(${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENCV_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
 ut_glob_app_sources(SOURCES "glfw_*.cpp")
 ut_create_executable(${PTHREAD_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARY} ${GLEW_LIBRARIES})
+MESSAGE(STATUS "build utGLFWConsole")
 ENDIF(GLFW_FOUND)
 #set_target_properties(${the_target} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:atlthunk.lib /NODEFAULTLIB:atlsd.lib /DEBUG")
 # ut_module_include_directories(../../src ${CMAKE_CURRENT_BINARY_DIR}/../../src)
