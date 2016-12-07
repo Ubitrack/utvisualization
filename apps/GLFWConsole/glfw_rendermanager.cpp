@@ -37,14 +37,16 @@ bool GLFWWindowImpl::is_valid() {
 
 bool GLFWWindowImpl::create() {
 	std::cout << "Create GLFW Window." << std::endl;
-	RenderManager& pRenderManager = RenderManager::singleton();
-	GLFWwindow* offscreen_context = (GLFWwindow*)(pRenderManager.getSharedOpenGLContext());
-	glfwMakeContextCurrent(offscreen_context);
+	GLFWwindow* offscreen_context = NULL;
 
 	// access OCL Manager and initialize if needed
 	Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
-	if (!oclManager.isInitialized())
+	if ((oclManager.isActive()) && (!oclManager.isInitialized()))
 	{
+		RenderManager& pRenderManager = RenderManager::singleton();
+		offscreen_context = (GLFWwindow*)(pRenderManager.getSharedOpenGLContext());
+		glfwMakeContextCurrent(offscreen_context);
+
 		if (oclManager.isEnabled()) {
 			oclManager.initializeOpenGL();
 		}

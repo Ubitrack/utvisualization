@@ -84,7 +84,7 @@ bool CameraHandle::setup(boost::shared_ptr<VirtualWindow>& window) {
 
         // access OCL Manager and initialize if needed
         Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
-        if (!oclManager.isInitialized())
+        if ((oclManager.isActive()) && (!oclManager.isInitialized()))
         {
             if (oclManager.isEnabled()) {
                 oclManager.initializeOpenGL();

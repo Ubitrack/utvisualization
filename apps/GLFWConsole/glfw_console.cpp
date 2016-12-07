@@ -64,6 +64,8 @@
 
 #include "glfw_rendermanager.h"
 #include "utVisualization/utRenderAPI.h"
+#include <utVision/OpenCLManager.h>
+
 
 
 using namespace Ubitrack;
@@ -187,15 +189,6 @@ int main( int ac, char** av )
 		// create and register render manager
 		RenderManager& pRenderManager = RenderManager::singleton();
 
-		// hack to create offscreen window for background context
-		glfwWindowHint(GLFW_VISIBLE, 0);
-		GLFWwindow* offscreen_context = glfwCreateWindow(640, 480, "", NULL, NULL);
-		pRenderManager.setSharedOpenGLContext((void *)offscreen_context);
-		glfwMakeContextCurrent(offscreen_context);
-
-		// set windows visible
-		glfwWindowHint(GLFW_VISIBLE, 1);
-
 		// configure ubitrack
 		std::cout << "Loading components..." << std::endl << std::flush;
 		Facade::AdvancedFacade utFacade( sComponentsPath );
@@ -215,6 +208,19 @@ int main( int ac, char** av )
 			
 			std::cout << "Sending UTQL to to server " << sUtqlFile << "..." << std::endl << std::flush;
 			utFacade.sendUtqlToServer( sUtqlFile );
+		}
+
+		// hack to create offscreen window for background context
+		Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
+		if (oclManager.isActive()) {
+			std::cout << "Create offscreen OpenGL Context." << std::endl;
+			glfwWindowHint(GLFW_VISIBLE, 0);
+			GLFWwindow* offscreen_context = glfwCreateWindow(640, 480, "", NULL, NULL);
+			pRenderManager.setSharedOpenGLContext((void *)offscreen_context);
+			glfwMakeContextCurrent(offscreen_context);
+
+			// set windows visible
+			glfwWindowHint(GLFW_VISIBLE, 1);
 		}
 
 		std::cout << "Starting dataflow" << std::endl;
