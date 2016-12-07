@@ -4,6 +4,19 @@
 
 #include "glfw_rendermanager.h"
 
+#include <utVision/OpenCLManager.h>
+#include <utUtil/TracingProvider.h>
+
+#ifdef HAVE_OPENCL
+#include <opencv2/core/ocl.hpp>
+#ifdef __APPLE__
+#include "OpenCL/cl_gl.h"
+#else
+#include "CL/cl_gl.h"
+#endif
+#endif
+
+
 using namespace Ubitrack::Visualization;
 
 
@@ -24,8 +37,22 @@ bool GLFWWindowImpl::is_valid() {
 
 bool GLFWWindowImpl::create() {
 	std::cout << "Create GLFW Window." << std::endl;
-    m_pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
-	glfwMakeContextCurrent(m_pWindow);
+	RenderManager& pRenderManager = RenderManager::singleton();
+	GLFWwindow* offscreen_context = (GLFWwindow*)(pRenderManager.getSharedOpenGLContext());
+	glfwMakeContextCurrent(offscreen_context);
+
+	// access OCL Manager and initialize if needed
+	Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
+	if (!oclManager.isInitialized())
+	{
+		if (oclManager.isEnabled()) {
+			oclManager.initializeOpenGL();
+		}
+		std::cout << "OCL Manager initialized: " << oclManager.isInitialized() << std::endl;
+	}
+
+	m_pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, offscreen_context);
+
 	// set fullscreen ?
     return m_pWindow != NULL;
 }

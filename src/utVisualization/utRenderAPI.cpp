@@ -179,13 +179,22 @@ RenderManager& RenderManager::singleton()
 
 
 RenderManager::RenderManager()
-        : m_iCameraCount(0) {
+        : m_iCameraCount(0)
+		, m_sharedOpenGLContext(NULL)
+{
 }
 
 RenderManager::~RenderManager() {
 
 }
 
+void RenderManager::setSharedOpenGLContext(void* ctx) {
+	m_sharedOpenGLContext = ctx;
+}
+
+void* RenderManager::getSharedOpenGLContext() {
+	return m_sharedOpenGLContext;
+}
 
 void RenderManager::setup() {
     // anything to do here ... most setup should be done in the client
