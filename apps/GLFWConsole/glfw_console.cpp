@@ -186,6 +186,9 @@ int main( int ac, char** av )
 
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
+		// set windows visible
+		glfwWindowHint(GLFW_VISIBLE, 1);
+
 		// create and register render manager
 		RenderManager& pRenderManager = RenderManager::singleton();
 
@@ -210,18 +213,6 @@ int main( int ac, char** av )
 			utFacade.sendUtqlToServer( sUtqlFile );
 		}
 
-		// hack to create offscreen window for background context
-		Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
-		if (oclManager.isActive()) {
-			std::cout << "Create offscreen OpenGL Context." << std::endl;
-			glfwWindowHint(GLFW_VISIBLE, 0);
-			GLFWwindow* offscreen_context = glfwCreateWindow(640, 480, "", NULL, NULL);
-			pRenderManager.setSharedOpenGLContext((void *)offscreen_context);
-			glfwMakeContextCurrent(offscreen_context);
-
-			// set windows visible
-			glfwWindowHint(GLFW_VISIBLE, 1);
-		}
 
 		std::cout << "Starting dataflow" << std::endl;
 		utFacade.startDataflow();
