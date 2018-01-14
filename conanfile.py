@@ -18,7 +18,7 @@ class UbitrackCoreConan(ConanFile):
         "ubitrack_core/%s@ubitrack/stable" % version,
         "ubitrack_vision/%s@ubitrack/stable" % version,
         "ubitrack_dataflow/%s@ubitrack/stable" % version,
-       )
+               )
 
     default_options = (
         "shared=True",
@@ -37,6 +37,7 @@ class UbitrackCoreConan(ConanFile):
     def requirements(self):
         if self.options.enable_glfwconsole:
             self.requires("glfw/3.2.1@camposs/stable")
+            self.requires("ubitrack_facade/%s@ubitrack/stable" % self.version)
 
     def imports(self):
         self.copy(pattern="*.dll", dst="bin", src="bin") # From bin to bin
@@ -72,4 +73,4 @@ class UbitrackCoreConan(ConanFile):
             suffix += self.version.replace(".", "")
             if self.settings.build_type == "Debug":
                 suffix += "d"
-        self.cpp_info.libs.append("utfacade%s" % (suffix))
+        self.cpp_info.libs.append("utvisualization%s" % (suffix))
