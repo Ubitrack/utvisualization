@@ -1,20 +1,63 @@
-set(the_description "The UbiTrack utGLFWConsole app")
-ut_add_app(utGLFWConsole DEPS utcore utdataflow utfacade utvision utvisualization)
+set(UBITRACK_APPLICATION_NAME utGLFWConsole)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
+# All cpp files for UTCORE
+file(GLOB UBITRACK_SRCS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+   "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+   "${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp"
+   "${CMAKE_CURRENT_SOURCE_DIR}/*/*/*.cpp"
+)
 
-FIND_PACKAGE(GLFW)
-FIND_PACKAGE(GLEW)
-IF(GLEW_FOUND)
-	SET(HAVE_GLEW 1)
-	add_definitions(-DHAVE_GLEW)
-ENDIF(GLEW_FOUND)
-IF(GLFW_FOUND)
-	set(HAVE_GLFW 1)
-	ut_app_include_directories(${UBITRACK_CORE_DEPS_INCLUDE_DIR} ${OPENCV_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
-	ut_glob_app_sources(SOURCES "glfw_*.cpp")
-	ut_create_executable(${PTHREAD_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARY} ${GLEW_LIBRARIES})
-ENDIF(GLFW_FOUND)
-#set_target_properties(${the_target} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:atlthunk.lib /NODEFAULTLIB:atlsd.lib /DEBUG")
-# ut_module_include_directories(../../src ${CMAKE_CURRENT_BINARY_DIR}/../../src)
+# All header files for UTCORE
+file(GLOB UBITRACK_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+   "${CMAKE_CURRENT_SOURCE_DIR}/*.h"  
+   "${CMAKE_CURRENT_SOURCE_DIR}/*/*.h" 
+   "${CMAKE_CURRENT_SOURCE_DIR}/*/*/*.h" 
+)
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/components)
+
+if(MSVC)
+  set(UBITRACK_COMPILE_DEFINITIONS ${UBITRACK_COMPILE_DEFINITIONS} "BOOST_ALL_DYN_LINK")
+endif(MSVC)
+
+# UTCORE library definition
+add_executable(${UBITRACK_APPLICATION_NAME} ${UBITRACK_SRCS} ${UBITRACK_HEADERS})
+
+target_link_libraries(${UBITRACK_APPLICATION_NAME} utvisualization ${CONAN_LIBS})
+
+# Apply Target Properties
+if(MSVC)
+  if(CMAKE_CROSSCOMPILING)
+    set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:secchk")
+  endif()
+  set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libc /DEBUG")
+endif()
+
+foreach(_flag ${UBITRACK_COMPILE_FLAGS})
+  set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES COMPILE_FLAGS "${_flag}")
+endforeach()
+foreach(_flag ${UBITRACK_LINK_FLAGS})
+  set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES LINK_FLAGS "${_flag}")
+endforeach()
+foreach(_flag ${UBITRACK_LINK_FLAGS_DEBUG})
+  set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES LINK_FLAGS_DEBUG "${_flag}")
+endforeach()
+foreach(_symb ${UBITRACK_DEFINES})
+  set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES DEFINE_SYMBOL ${_symb})
+endforeach()
+
+# set compiler Definitions
+set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES COMPILE_DEFINITIONS "${UBITRACK_COMPILE_DEFINITIONS}")
+
+set_target_properties(${UBITRACK_APPLICATION_NAME} PROPERTIES
+  DEBUG_POSTFIX "${UBITRACK_DEBUG_POSTFIX}"
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_INSTALL_BINDIR}
+  )
+
+# Installation of libraries, headers and documents
+install(TARGETS ${UBITRACK_APPLICATION_NAME}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  )
