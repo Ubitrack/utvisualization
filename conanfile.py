@@ -28,15 +28,15 @@ class UbitrackCoreConan(ConanFile):
     # all sources are deployed with the package
     exports_sources = "apps/*", "cmake/*", "components/*", "doc/*", "src/*", "CMakeLists.txt"
 
-    def build_requirements(self):
-        if self.options.enable_glfwconsole:
-            self.build_requires("glfw/3.2.1@camposs/stable")
-
     def configure(self):
         if self.options.shared:
             self.options['ubitrack_core'].shared = True
             self.options['ubitrack_vision'].shared = True
             self.options['ubitrack_dataflow'].shared = True
+
+    def requirements(self):
+        if self.options.enable_glfwconsole:
+            self.requires("glfw/3.2.1@camposs/stable")
 
     def imports(self):
         self.copy(pattern="*.dll", dst="bin", src="bin") # From bin to bin
