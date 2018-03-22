@@ -13,12 +13,12 @@ class UbitrackCoreConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     options = {"shared": [True, False],
-               "enable_glfwconsole": [True, False]}
+               "enable_glfwconsole": [True, False],
+               }
     requires = (
         "ubitrack_core/%s@ubitrack/stable" % version,
         "ubitrack_vision/%s@ubitrack/stable" % version,
         "ubitrack_dataflow/%s@ubitrack/stable" % version,
-        "glad/0.1.16a0@bincrafters/stable",
                )
 
     default_options = (
@@ -40,6 +40,7 @@ class UbitrackCoreConan(ConanFile):
             self.requires("glfw/3.2.1@camposs/stable")
             self.requires("ubitrack_facade/%s@ubitrack/stable" % self.version)
 
+
     def imports(self):
         self.copy(pattern="*.dll", dst="bin", src="bin") # From bin to bin
         self.copy(pattern="*.dylib*", dst="lib", src="lib") 
@@ -48,6 +49,7 @@ class UbitrackCoreConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions['BUILD_SHARED_LIBS'] = self.options.shared
         cmake.definitions['ENABLE_GLFWCONSOLE'] = self.options.enable_glfwconsole
+
         cmake.configure()
         cmake.build()
         cmake.install()

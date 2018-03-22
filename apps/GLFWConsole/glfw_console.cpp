@@ -21,9 +21,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-
-#include <utVisualization/OpenGLWrapper.h>
-#include <GLFW/glfw3.h>
+#include "glfw_rendermanager.h"
 
 #include <stdlib.h>
 #include <signal.h>
@@ -43,11 +41,6 @@
 #include <utUtil/Exception.h>
 #include <utUtil/Logging.h>
 #include <utUtil/OS.h>
-
-#include "glfw_rendermanager.h"
-#include "utVisualization/utRenderAPI.h"
-#include <utVision/OpenCLManager.h>
-
 
 
 using namespace Ubitrack;

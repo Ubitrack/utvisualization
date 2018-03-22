@@ -5,13 +5,13 @@
 #ifndef UBITRACK_GLFW_RENDERMANAGER_H
 #define UBITRACK_GLFW_RENDERMANAGER_H
 
-#include <string>
+#include <utVisualization.h>
 
-#include <utVisualization/OpenGLWrapper.h>
-
-#include <GLFW/glfw3.h>
-
+#include <utVision/OpenGLPlatform.h>
 #include <utVisualization/utRenderAPI.h>
+
+#include <string>
+#include <GLFW/glfw3.h>
 
 namespace Ubitrack {
     namespace Visualization {

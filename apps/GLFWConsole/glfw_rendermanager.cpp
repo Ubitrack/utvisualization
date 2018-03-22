@@ -38,6 +38,7 @@ bool GLFWWindowImpl::is_valid() {
 bool GLFWWindowImpl::create() {
 	std::cout << "Create GLFW Window." << std::endl;
 
+#ifdef HAVE_OPENCL
 	// access OCL Manager and initialize if needed
 	Vision::OpenCLManager& oclManager = Vision::OpenCLManager::singleton();
 	if ((oclManager.isActive()) && (!oclManager.isInitialized()))
@@ -48,6 +49,7 @@ bool GLFWWindowImpl::create() {
 		}
 		std::cout << "OCL Manager initialized: " << oclManager.isInitialized() << std::endl;
 	}
+#endif
 
 	m_pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
 
@@ -93,6 +95,8 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
 
 	glfwMakeContextCurrent(m_pWindow);
 
+// @todo we should make sure that not both libraries are active ...
+#ifdef HAVE_GLAD
     // Init GLAD for this context:
     std::cout << "Initialize GLAD." << std::endl;
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
@@ -101,6 +105,18 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
         glfwDestroyWindow(m_pWindow);
         return;
     }
+#endif
+#ifdef HAVE_GLEW
+    // Init GLEW for this context:
+   std::cout << "Initialize GLEW." << std::endl;
+   GLenum err = glewInit();
+    if (err != GLEW_OK)
+        std::cout << "GLEW Error occured, Description: " <<  glewGetErrorString(err) << std::endl;
+         glfwDestroyWindow(m_pWindow);
+         return;
+     }
+#endif
+
 
     // GL: enable and set colors
     glEnable(GL_COLOR_MATERIAL);
