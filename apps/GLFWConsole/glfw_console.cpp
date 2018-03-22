@@ -22,23 +22,7 @@
  */
 
 
-// GLAD
-#include <glad/glad.h>
-
-// #ifdef _WIN32
-// 	#include <utUtil/CleanWindows.h>
-// 	#include <GL/gl.h>
-// 	#include <GL/glu.h>
-// #elif __APPLE__
-// 	#include <OpenGL/OpenGL.h>
-// 	#include <OpenGL/glu.h>
-// #else
-// 	#include <GL/gl.h>
-// 	#include <GL/glext.h> // Linux headers
-// 	//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
-// 	#include <GL/glu.h>
-// #endif
-
+#include <utVisualization/OpenGLWrapper.h>
 #include <GLFW/glfw3.h>
 
 #include <stdlib.h>
@@ -76,12 +60,51 @@ void ctrlC ( int i )
 	bStop = true;
 }
 
+
+const GLubyte* glGetErrorString(GLenum errorCode)
+{
+    if(errorCode==GL_NO_ERROR)
+	{
+		return (const GLubyte *) "no error";
+    }
+    if(errorCode==GL_INVALID_ENUM)
+	{
+		return (const GLubyte *) "invalid enum";
+    }
+    if(errorCode==GL_INVALID_VALUE)
+	{
+		return (const GLubyte *) "invalid value";
+    }
+    if(errorCode==GL_INVALID_OPERATION)
+	{
+		return (const GLubyte *) "invalid operation";
+    }
+    if(errorCode==GL_INVALID_FRAMEBUFFER_OPERATION)
+	{
+		return (const GLubyte *) "invalid framebuffer operation";
+    }
+    if(errorCode==GL_OUT_OF_MEMORY)
+	{
+		return (const GLubyte *) "out of memory";
+    }
+    if(errorCode==GL_STACK_UNDERFLOW)
+	{
+		return (const GLubyte *) "stack underflow";
+    }
+    if(errorCode==GL_STACK_OVERFLOW)
+	{
+		return (const GLubyte *) "stack overflow";
+    }
+
+    return 0;
+}
+
 void CheckForGLErrors(std::string a_szMessage)
 {
     GLenum error = glGetError();
     while (error != GL_NO_ERROR)
     {
-        std::cout << "Error: " << a_szMessage.c_str() << ", ErrorID: " << error << ": " << gluErrorString(error);
+        std::cout << "Error: " << a_szMessage.c_str() << ", ErrorID: " << error << ": " << glGetErrorString(error);
         error = glGetError(); // get next error if any.
     }
 }

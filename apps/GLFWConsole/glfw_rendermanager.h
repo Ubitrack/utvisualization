@@ -7,8 +7,7 @@
 
 #include <string>
 
-#define GLAD_GL_IMPLEMENTATION
-#include <glad/glad.h>
+#include <utVisualization/OpenGLWrapper.h>
 
 #include <GLFW/glfw3.h>
 

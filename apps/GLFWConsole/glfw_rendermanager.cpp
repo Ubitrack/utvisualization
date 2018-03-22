@@ -94,11 +94,10 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
 	glfwMakeContextCurrent(m_pWindow);
 
     // Init GLAD for this context:
-	std::cout << "Initialize GLAD." << std::endl;
-    if (!gladLoadGLSimple((GLADsimpleloadproc) glfwGetProcAddress))
+    std::cout << "Initialize GLAD." << std::endl;
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
-        // a problem occured when trying to init glew, report it:
-        std::cout << "GLAD Error occured" << std::endl;
+        std::cout << "Failed to initialize OpenGL context" << std::endl;
         glfwDestroyWindow(m_pWindow);
         return;
     }
