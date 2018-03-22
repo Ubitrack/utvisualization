@@ -93,19 +93,15 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
 
 	glfwMakeContextCurrent(m_pWindow);
 
-#ifdef HAVE_GLEW
-    // Init GLEW for this context:
-	std::cout << "Initialize GLEW." << std::endl;
-	GLenum err = glewInit();
-    if (err != GLEW_OK)
+    // Init GLAD for this context:
+	std::cout << "Initialize GLAD." << std::endl;
+    if (!gladLoadGLSimple((GLADsimpleloadproc) glfwGetProcAddress))
     {
         // a problem occured when trying to init glew, report it:
-        std::cout << "GLEW Error occured, Description: " <<  glewGetErrorString(err) << std::endl;
+        std::cout << "GLAD Error occured" << std::endl;
         glfwDestroyWindow(m_pWindow);
         return;
     }
-#endif
-
 
     // GL: enable and set colors
     glEnable(GL_COLOR_MATERIAL);

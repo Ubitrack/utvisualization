@@ -15,8 +15,6 @@ class UbitrackCoreConan(ConanFile):
     options = {"shared": [True, False],
                "enable_glfwconsole": [True, False]}
     requires = (
-        "glew/[>=2.1.0]@camposs/stable",
-        
         "ubitrack_core/%s@ubitrack/stable" % version,
         "ubitrack_vision/%s@ubitrack/stable" % version,
         "ubitrack_dataflow/%s@ubitrack/stable" % version,
