@@ -17,9 +17,6 @@
 #	define UBITRACK_EXPORT
 #endif
 
-#ifndef HAVE_GLEW
-#cmakedefine HAVE_GLEW
-#endif
 #ifndef HAVE_LAPACK 
 #cmakedefine HAVE_LAPACK
 #endif

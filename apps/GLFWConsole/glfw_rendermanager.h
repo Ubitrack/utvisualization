@@ -7,9 +7,7 @@
 
 #include <string>
 
-#ifdef HAVE_GLEW
-	#include "GL/glew.h"
-#endif
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <utVisualization/utRenderAPI.h>

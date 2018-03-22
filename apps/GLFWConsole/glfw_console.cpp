@@ -22,24 +22,22 @@
  */
 
 
+// GLAD
+#include <glad/glad.h>
 
-#ifdef HAVE_GLEW
-	#include "GL/glew.h"
-#endif
-
-#ifdef _WIN32
-	#include <utUtil/CleanWindows.h>
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-#elif __APPLE__
-	#include <OpenGL/OpenGL.h>
-	#include <OpenGL/glu.h>
-#else
-	#include <GL/gl.h>
-	#include <GL/glext.h> // Linux headers
-	//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
-	#include <GL/glu.h>
-#endif
+// #ifdef _WIN32
+// 	#include <utUtil/CleanWindows.h>
+// 	#include <GL/gl.h>
+// 	#include <GL/glu.h>
+// #elif __APPLE__
+// 	#include <OpenGL/OpenGL.h>
+// 	#include <OpenGL/glu.h>
+// #else
+// 	#include <GL/gl.h>
+// 	#include <GL/glext.h> // Linux headers
+// 	//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
+// 	#include <GL/glu.h>
+// #endif
 
 #include <GLFW/glfw3.h>
 
