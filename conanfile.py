@@ -14,6 +14,7 @@ class UbitrackCoreConan(ConanFile):
     generators = "cmake"
     options = {"shared": [True, False],
                "enable_glfwconsole": [True, False],
+               "opengl_extension_wrapper": "ANY",
                }
     requires = (
         "ubitrack_core/%s@ubitrack/stable" % version,
@@ -24,6 +25,7 @@ class UbitrackCoreConan(ConanFile):
     default_options = (
         "shared=True",
         "enable_glfwconsole=True",
+        "opengl_extension_wrapper=glad",
         )
 
     # all sources are deployed with the package
@@ -34,17 +36,12 @@ class UbitrackCoreConan(ConanFile):
             self.options['ubitrack_core'].shared = True
             self.options['ubitrack_vision'].shared = True
             self.options['ubitrack_dataflow'].shared = True
+        self.options.opengl_extension_wrapper = self.options['ubitrack_vision'].opengl_extension_wrapper
 
     def requirements(self):
         if self.options.enable_glfwconsole:
             self.requires("glfw/3.2.1@camposs/stable")
             self.requires("ubitrack_facade/%s@ubitrack/stable" % self.version)
-
-        if self.options["ubitrack_vision"].opengl_extension_wrapper == 'glad':
-            self.requires("glad/[>=0.1.27]@camposs/stable")
-        elif self.options["ubitrack_vision"].opengl_extension_wrapper == 'glew':
-            self.requires("glew/2.1.0@camposs/stable")
-
 
 
     def imports(self):
