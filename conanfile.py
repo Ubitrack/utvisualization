@@ -40,6 +40,12 @@ class UbitrackCoreConan(ConanFile):
             self.requires("glfw/3.2.1@camposs/stable")
             self.requires("ubitrack_facade/%s@ubitrack/stable" % self.version)
 
+        if self.options["ubitrack_vision"].opengl_extension_wrapper == 'glad':
+            self.requires("glad/[>=0.1.27]@camposs/stable")
+        elif self.options["ubitrack_vision"].opengl_extension_wrapper == 'glew':
+            self.requires("glew/2.1.0@camposs/stable")
+
+
 
     def imports(self):
         self.copy(pattern="*.dll", dst="bin", src="bin") # From bin to bin
