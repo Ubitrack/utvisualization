@@ -36,10 +36,4 @@
 // fetch defines from utVision
 #include <utVision/Config.h>
 
-#ifndef HAVE_LAPACK 
-#cmakedefine HAVE_LAPACK
-#endif
-#ifndef HAVE_OPENCV 
-#cmakedefine HAVE_OPENCV
-#endif
 #endif

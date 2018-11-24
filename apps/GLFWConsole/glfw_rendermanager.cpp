@@ -2,6 +2,9 @@
 // Created by Ulrich Eck on 26/07/2015.
 //
 
+#include <utVisualization.h>
+#include <utVision/OpenGLPlatform.h>
+
 #include "glfw_rendermanager.h"
 
 #include <utVision/OpenCLManager.h>
@@ -108,12 +111,12 @@ void GLFWWindowImpl::initGL(boost::shared_ptr<CameraHandle>& event_handler) {
 #endif
 #ifdef HAVE_GLEW
     // Init GLEW for this context:
-   std::cout << "Initialize GLEW." << std::endl;
-   GLenum err = glewInit();
-    if (err != GLEW_OK)
+    std::cout << "Initialize GLEW." << std::endl;
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
         std::cout << "GLEW Error occured, Description: " <<  glewGetErrorString(err) << std::endl;
-         glfwDestroyWindow(m_pWindow);
-         return;
+        glfwDestroyWindow(m_pWindow);
+        return;
      }
 #endif
 
