@@ -14,7 +14,6 @@ class UbitrackCoreConan(ConanFile):
     generators = "cmake"
     options = {"shared": [True, False],
                "enable_glfwconsole": [True, False],
-               "opengl_extension_wrapper": "ANY",
                }
     requires = (
         "ubitrack_core/%s@ubitrack/stable" % version,
@@ -25,7 +24,6 @@ class UbitrackCoreConan(ConanFile):
     default_options = (
         "shared=True",
         "enable_glfwconsole=True",
-        "opengl_extension_wrapper=glad",
         )
 
     # all sources are deployed with the package
@@ -36,7 +34,6 @@ class UbitrackCoreConan(ConanFile):
             self.options['ubitrack_core'].shared = True
             self.options['ubitrack_vision'].shared = True
             self.options['ubitrack_dataflow'].shared = True
-        self.options.opengl_extension_wrapper = self.options['ubitrack_vision'].opengl_extension_wrapper
 
     def requirements(self):
         if self.options.enable_glfwconsole:
@@ -80,3 +77,7 @@ class UbitrackCoreConan(ConanFile):
             if self.settings.build_type == "Debug":
                 suffix += "d"
         self.cpp_info.libs.append("utvisualization%s" % (suffix))
+
+
+    def package_id(self):
+        self.requires["ubitrack_vision"].full_package_mode()
