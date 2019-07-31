@@ -20,7 +20,7 @@ class UbitrackCoreConan(ConanFile):
 
     default_options = {
         "shared":True,
-        "workspaceBuild" : True,
+        "workspaceBuild" : False,
         "enable_glfwconsole":True,
         }
 
