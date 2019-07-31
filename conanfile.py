@@ -13,18 +13,16 @@ class UbitrackCoreConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     options = {"shared": [True, False],
+               "workspaceBuild" : [True, False],
                "enable_glfwconsole": [True, False],
                }
-    requires = (
-        "ubitrack_core/%s@ubitrack/stable" % version,
-        "ubitrack_vision/%s@ubitrack/stable" % version,
-        "ubitrack_dataflow/%s@ubitrack/stable" % version,
-               )
+  
 
-    default_options = (
-        "shared=True",
-        "enable_glfwconsole=True",
-        )
+    default_options = {
+        "shared":True,
+        "workspaceBuild" : True,
+        "enable_glfwconsole":True,
+        }
 
     # all sources are deployed with the package
     exports_sources = "apps/*", "cmake/*", "components/*", "doc/*", "src/*", "CMakeLists.txt", "utvisualizationConfig.cmake"
@@ -36,9 +34,18 @@ class UbitrackCoreConan(ConanFile):
             self.options['ubitrack_dataflow'].shared = True
 
     def requirements(self):
+        userChannel = "ubitrack/stable"
+        if self.options.workspaceBuild:
+            userChannel = "local/dev"
+
+        self.requires("ubitrack_core/%s@%s" % (self.version, userChannel))
+        self.requires("ubitrack_vision/%s@%s" % (self.version, userChannel))
+        self.requires("ubitrack_dataflow/%s@%s" % (self.version, userChannel))
+
         if self.options.enable_glfwconsole:
             self.requires("glfw/3.2.1@camposs/stable")
-            self.requires("ubitrack_facade/%s@ubitrack/stable" % self.version)
+            self.requires("ubitrack_facade/%s@%s" % (self.version, userChannel))
+        
 
 
     # def imports(self):
