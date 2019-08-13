@@ -2,6 +2,8 @@
 // Created by Ulrich Eck on 26/07/2015.
 //
 
+#include <iostream>
+
 #include <utVisualization.h>
 #include <utVision/OpenGLPlatform.h>
 
