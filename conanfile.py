@@ -43,7 +43,7 @@ class UbitrackCoreConan(ConanFile):
         self.requires("ubitrack_dataflow/%s@%s" % (self.version, userChannel))
 
         if self.options.enable_glfwconsole:
-            self.requires("glfw/3.2.1@camposs/stable")
+            self.requires("glfw/3.3@camposs/stable")
             self.requires("ubitrack_facade/%s@%s" % (self.version, userChannel))
         
 
