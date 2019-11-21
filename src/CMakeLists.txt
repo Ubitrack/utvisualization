@@ -27,14 +27,19 @@ FILE(GLOB UBITRACK_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
 # UTCORE library definition
 ADD_LIBRARY(${UBITRACK_LIBRARY_NAME} ${UBITRACK_SRCS} ${UBITRACK_HEADERS})
 
-target_link_libraries(${UBITRACK_LIBRARY_NAME} 
+target_link_libraries(${UBITRACK_LIBRARY_NAME} PUBLIC
   CONAN_PKG::ubitrack_core
   CONAN_PKG::ubitrack_vision
   ${GLWRAPPER_TARGET}
   OpenGL::GL
   OpenGL::GLU
-  OpenCL::OpenCL
   )
+
+if(WITH_OPENCL)
+  target_link_libraries(${UBITRACK_LIBRARY_NAME} PUBLIC
+    OpenCL::OpenCL
+  )
+endif()
 
 target_include_directories(${UBITRACK_LIBRARY_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

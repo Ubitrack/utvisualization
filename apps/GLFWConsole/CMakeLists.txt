@@ -21,7 +21,7 @@ endif(MSVC)
 # UTCORE library definition
 add_executable(${UBITRACK_APPLICATION_NAME} ${UBITRACK_SRCS} ${UBITRACK_HEADERS})
 
-target_link_libraries(${UBITRACK_APPLICATION_NAME} 
+target_link_libraries(${UBITRACK_APPLICATION_NAME} PUBLIC
   CONAN_PKG::ubitrack_core
   CONAN_PKG::ubitrack_vision
   utvisualization
@@ -29,8 +29,13 @@ target_link_libraries(${UBITRACK_APPLICATION_NAME}
   CONAN_PKG::glfw
   OpenGL::GL
   OpenGL::GLU
-  OpenCL::OpenCL
   )
+
+if(WITH_OPENCL)
+  target_link_libraries(${UBITRACK_APPLICATION_NAME} PUBLIC
+    OpenCL::OpenCL
+  )
+endif()
 
 target_include_directories(${UBITRACK_APPLICATION_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

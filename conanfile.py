@@ -56,6 +56,7 @@ class UbitrackCoreConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions['BUILD_SHARED_LIBS'] = self.options.shared
         cmake.definitions['ENABLE_GLFWCONSOLE'] = self.options.enable_glfwconsole
+        cmake.definitions['WITH_OPENCL'] = self.options['ubitrack_vision'].with_opencl
 
         cmake.configure()
         cmake.build()
