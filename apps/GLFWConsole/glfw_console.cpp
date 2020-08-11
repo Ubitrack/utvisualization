@@ -35,10 +35,14 @@
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/glu.h>
 #else
-	#include <GL/gl.h>
-	#include <GL/glext.h> // Linux headers
-	//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
-	#include <GL/glu.h>
+	#ifdef HAVE_GLEW
+		// We do not need to include gl headers at all. GLEW takes care of that.
+	#else
+		#include <GL/gl.h>
+		#include <GL/glext.h> // Linux headers
+		//#include <GL/wglext.h> // Windows headers - Not sure which ones cygwin needs. Just try it
+		#include <GL/glu.h>
+	#endif
 #endif
 
 #include <GLFW/glfw3.h>
