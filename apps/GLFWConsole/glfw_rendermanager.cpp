@@ -16,6 +16,7 @@
 #endif
 #endif
 
+#include <iostream>
 
 using namespace Ubitrack::Visualization;
 
